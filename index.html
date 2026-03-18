@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MobileTech Resolution Notes</title>
+
+  <style>
+    :root {
+      --primary:#0F62FE;
+      --border:#E5E7EB;
+      --bg:#F8FAFC;
+      --card:#FFFFFF;
+      --text:#111827;
+      --muted:#6B7280;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 120px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 12px;
+      display: block;
+      margin-top: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .crew-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    button.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <h1>MobileTech Resolution Notes</h1>
+
+  <!-- DATE -->
+  <div class="card">
+    <label>Date (work performed)</label>
+    <input type="date" id="workDate">
+    <div class="hint">(Copied as MM/DD/YY)</div>
+  </div>
+
+  <!-- CREWS -->
+  <div id="crews"></div>
+</div>
+
+<!-- BOTTOM BUTTONS -->
+<div class="bottom-bar">
+  <button class="primary" onclick="addCrew()">Add Crew</button>
+  <button onclick="copyAll()">Copy All</button>
+  <button onclick="clearAll()">Clear All</button>
+</div>
+
+<script>
+  let crewCount = 0;
+  const crewsDiv = document.getElementById("crews");
+
+  function addCrew() {
+    crewCount++;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="crew-title">Crew #${crewCount}</div>
+
+      <label>Crew Members</label>
+      <input>
+
+      <label>Truck(s)</label>
+      <input>
+
+      <div class="row">
+        <div>
+          <label>Start Time</label>
+          <input>
+        </div>
+        <div>
+          <label>Stop Time</label>
+          <input>
+        </div>
+      </div>
+
+      <label>Work Performed</label>
+      <div class="hint">(Be specific — work completed, travel for materials, standby time, weather delays, additional work requested, etc.)</div>
+      <textarea></textarea>
+
+      <label>Equipment on Rent (if applicable)</label>
+      <div class="hint">(Unit #, vendor, PO #, footage / mileage, etc. — one item per line)</div>
+      <textarea></textarea>
+    `;
+
+    crewsDiv.appendChild(card);
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+    const d = new Date(value + "T00:00:00");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${mm}/${dd}/${yy}`;
+  }
+
+  function copyAll() {
+    let output = [];
+
+    const dateVal = formatDate(document.getElementById("workDate").value);
+    if (dateVal) {
+      output.push(`Date: ${dateVal}`, "");
+    }
+
+    Array.from(crewsDiv.children).forEach((crew, i) => {
+      const fields = crew.querySelectorAll("input, textarea");
+
+      output.push(`Crew #${i + 1}`);
+      output.push(`Crew Members: ${fields[0].value}`);
+
+      if (fields[1].value.trim()) {
+        output.push(`Truck(s): ${fields[1].value}`);
+      }
+
+      output.push(
+        `Start Time: ${fields[2].value}`,
+        `Stop Time: ${fields[3].value}`,
+        "",
+        "Work Performed:",
+        fields[4].value
+      );
+
+      if (fields[5].value.trim()) {
+        output.push(
+          "",
+          "Equipment on Rent (if applicable):",
+          fields[5].value
+        );
+      }
+
+      output.push("");
+    });
+
+    navigator.clipboard.writeText(output.join("\n"));
+    alert("Copied. Paste into MobileTech.");
+  }
+
+  function clearAll() {
+    if (confirm("Clear all crews?")) {
+      crewsDiv.innerHTML = "";
+      crewCount = 0;
+      addCrew();
+    }
+  }
+
+  addCrew();
+</script>
+
+</body>
+</html>
