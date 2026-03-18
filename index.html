@@ -99,6 +99,7 @@
       display: flex;
       gap: 8px;
       justify-content: center;
+      z-index: 10;
     }
 
     button {
@@ -163,20 +164,24 @@
       <div class="row">
         <div>
           <label>Start Time</label>
-          <input>
+          <input type="time">
         </div>
         <div>
           <label>Stop Time</label>
-          <input>
+          <input type="time">
         </div>
       </div>
 
       <label>Work Performed</label>
-      <div class="hint">(Be specific — work completed, travel for materials, standby time, weather delays, additional work requested, etc.)</div>
+      <div class="hint">
+        (Be specific — work completed, travel, standby, weather delays, and additional work requested.)
+      </div>
       <textarea></textarea>
 
       <label>Equipment on Rent (if applicable)</label>
-      <div class="hint">(Unit #, vendor, PO #, footage / mileage, etc. — one item per line)</div>
+      <div class="hint">
+        (Unit #, vendor, PO #, footage / mileage — one item per line.)
+      </div>
       <textarea></textarea>
     `;
 
@@ -190,6 +195,16 @@
     const dd = String(d.getDate()).padStart(2, "0");
     const yy = String(d.getFullYear()).slice(-2);
     return `${mm}/${dd}/${yy}`;
+  }
+
+  function formatTime(value) {
+    if (!value) return "";
+    const [hour, minute] = value.split(":").map(Number);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const h12 = hour % 12 || 12;
+    return `${String(h12).padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")} ${ampm}`;
   }
 
   function copyAll() {
@@ -211,8 +226,8 @@
       }
 
       output.push(
-        `Start Time: ${fields[2].value}`,
-        `Stop Time: ${fields[3].value}`,
+        `Start Time: ${formatTime(fields[2].value)}`,
+        `Stop Time: ${formatTime(fields[3].value)}`,
         "",
         "Work Performed:",
         fields[4].value
@@ -241,6 +256,7 @@
     }
   }
 
+  // Initialize with one crew
   addCrew();
 </script>
 
