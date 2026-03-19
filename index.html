@@ -1,362 +1,196 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MobileTech Resolution Notes</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MobileTech Resolution Notes</title>
 
-  <style>
-    :root {
-      --primary:#0F62FE;
-      --border:#E5E7EB;
-      --bg:#F8FAFC;
-      --card:#FFFFFF;
-      --text:#111827;
-      --muted:#6B7280;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .wrapper {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 16px;
-      padding-bottom: 140px;
-    }
-
-    h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .help-btn {
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: #FFFFFF;
-      cursor: pointer;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 12px;
-      display: block;
-      margin-top: 8px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      margin-top: 4px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 600px) {
-      .row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .crew-members-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #FFFFFF;
-      border-top: 1px solid var(--border);
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    button {
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      font-weight: 600;
-      padding: 10px 16px;
-      background: #FFFFFF;
-    }
-
-    button.primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    /* HELP PANEL */
-    .help-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      display: none;
-      z-index: 30;
-    }
-
-    .help-panel {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: min(420px, 100%);
-      height: 100%;
-      background: #fff;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
-    .help-close {
-      text-align: right;
-      font-weight: 600;
-      color: var(--primary);
-      cursor: pointer;
-    }
-
-    /* Rental rows */
-    .rental-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .remove-btn {
-      background: #f87171;
-      color: white;
-      border-radius: 6px;
-      padding: 8px;
-      font-size: 12px;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+<style>
+:root {
+  --primary:#0F62FE;
+  --border:#E5E7EB;
+  --bg:#F8FAFC;
+  --card:#FFFFFF;
+}
+body {
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:var(--bg);
+}
+.wrapper {
+  max-width:900px;
+  margin:auto;
+  padding:16px;
+  padding-bottom:140px;
+}
+h1{font-size:20px;margin:0;}
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:16px;
+}
+label {
+  font-size:12px;
+  font-weight:600;
+  display:block;
+  margin-top:6px;
+}
+input, textarea, select, button {
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  font-size:14px;
+}
+textarea {resize:vertical;}
+.row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.crew-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:8px;
+  margin-top:8px;
+}
+.date-header {
+  font-weight:700;
+  margin-bottom:6px;
+}
+.divider {
+  height:1px;
+  background:var(--border);
+  margin:12px 0;
+}
+.bottom-bar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
+  background:#fff;
+  border-top:1px solid var(--border);
+}
+.primary {
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+}
+</style>
 </head>
 
 <body>
 <div class="wrapper">
+  <h1>MobileTech Resolution Notes</h1>
 
-  <div class="top-bar">
-    <h1>MobileTech Resolution Notes</h1>
-    <button class="help-btn" onclick="openHelp()">Help</button>
-  </div>
-
-  <!-- Smartfill lists -->
   <datalist id="crewList"></datalist>
   <datalist id="customerList"></datalist>
   <datalist id="locationList"></datalist>
 
-  <!-- JOB INFO -->
   <div class="card">
-    <label>Date (work performed)</label>
+    <label>Customer & Lease</label>
     <div class="row">
-      <input type="date" id="workDate">
-      <button type="button" onclick="nextDay()">Next Day</button>
-    </div>
-    <div class="hint">(Next Day advances date and resets crews)</div>
-
-    <div class="row">
-      <div>
-        <label>Customer</label>
-        <input id="customer" list="customerList">
-      </div>
-      <div>
-        <label>Lease / Location</label>
-        <input id="location" list="locationList">
-      </div>
+      <input id="customer" list="customerList" placeholder="Customer">
+      <input id="location" list="locationList" placeholder="Lease / Location">
     </div>
   </div>
 
-  <div id="crews"></div>
-
+  <div id="days"></div>
 </div>
 
 <div class="bottom-bar">
-  <button class="primary" onclick="addCrew()">Add Crew</button>
+  <button class="primary" onclick="nextDay()">Next Day</button>
   <button onclick="copyAll()">Copy All</button>
-  <button onclick="clearAll()">Clear All</button>
-</div>
-
-<!-- HELP PANEL -->
-<div class="help-overlay" id="helpOverlay" onclick="closeHelp()">
-  <div class="help-panel" onclick="event.stopPropagation()">
-    <div class="help-close" onclick="closeHelp()">Close ✕</div>
-    <p>Use this page to generate daily MobileTech Resolution Notes. Nothing is saved.</p>
-    <p><strong>Next Day</strong> starts a new day and clears crews.</p>
-    <p>Rentals & Materials copy cleanly with no labels.</p>
-  </div>
 </div>
 
 <script>
-  const crewStore="crewMemory", custStore="custMemory", locStore="locMemory";
-  const crewList=document.getElementById("crewList");
-  const customerList=document.getElementById("customerList");
-  const locationList=document.getElementById("locationList");
-  const crewsDiv=document.getElementById("crews");
+const daysDiv = document.getElementById("days");
+const today = () => new Date().toISOString().split("T")[0];
 
-  function loadList(key, list){
-    const a=JSON.parse(localStorage.getItem(key)||"[]"); list.innerHTML="";
-    a.forEach(v=>{let o=document.createElement("option");o.value=v;list.appendChild(o);});
+function addDay(date){
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="date-header">${date}</div>
+    <div class="divider"></div>
+    <div class="crews"></div>
+    <button onclick="addCrew(this)">Add Crew</button>
+  `;
+  daysDiv.appendChild(card);
+  addCrew(card.querySelector("button")); // ✅ Crew #1 automatic
+}
+
+function nextDay(){
+  const last = daysDiv.lastElementChild;
+  const lastDate = last.querySelector(".date-header").innerText;
+  const d=new Date(lastDate+"T00:00");
+  d.setDate(d.getDate()+1);
+  addDay(d.toISOString().split("T")[0]);
+  daysDiv.lastElementChild.scrollIntoView({behavior:"smooth"});
+}
+
+function addCrew(btn){
+  const crews=btn.previousElementSibling;
+  const crewNum=crews.children.length+1;
+  const c=document.createElement("div");
+  c.innerHTML=`
+    <label>Crew #${crewNum} Size</label>
+    <select onchange="renderCrew(this)">
+      <option value="1">1-Man Crew</option>
+      <option value="2">2-Man Crew</option>
+      <option value="3">3-Man Crew</option>
+      <option value="4">4-Man Crew</option>
+      <option value="5">5-Man Crew</option>
+    </select>
+    <div class="crew-grid"></div>
+    <div class="row">
+      <input type="time"><input type="time">
+    </div>
+    <label>Work Performed</label>
+    <textarea></textarea>
+  `;
+  crews.appendChild(c);
+  renderCrew(c.querySelector("select"));
+}
+
+function renderCrew(sel){
+  const grid=sel.nextElementSibling;
+  grid.innerHTML="";
+  for(let i=0;i<sel.value;i++){
+    const inp=document.createElement("input");
+    inp.placeholder="Crew Member";
+    grid.appendChild(inp);
   }
-  function saveVal(key,v,list){
-    v=v.trim(); if(!v) return;
-    let a=JSON.parse(localStorage.getItem(key)||"[]");
-    if(!a.includes(v)){a.push(v);localStorage.setItem(key,JSON.stringify(a));loadList(key,list);}
-  }
+}
 
-  customer.addEventListener("blur",()=>saveVal(custStore,customer.value,customerList));
-  location.addEventListener("blur",()=>saveVal(locStore,location.value,locationList));
-
-  loadList(custStore,customerList);
-  loadList(locStore,locationList);
-
-  function openHelp(){helpOverlay.style.display="block";}
-  function closeHelp(){helpOverlay.style.display="none";}
-
-  function nextDay(){
-    const d=workDate.value?new Date(workDate.value+"T00:00"):new Date();
-    d.setDate(d.getDate()+1);
-    workDate.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    crewsDiv.innerHTML=""; addCrew();
-  }
-
-  function addCrew(){
-    const c=document.createElement("div"); c.className="card";
-    c.innerHTML=`
-      <label>Crew Size</label>
-      <select onchange="renderCrew(this)">
-        <option value="1">1‑Man Crew</option>
-        <option value="2">2‑Man Crew</option>
-        <option value="3">3‑Man Crew</option>
-        <option value="4">4‑Man Crew</option>
-        <option value="5">5‑Man Crew</option>
-      </select>
-      <div class="crew-members-grid"></div>
-
-      <label>Start / Stop Time</label>
-      <div class="row">
-        <input type="time">
-        <input type="time">
-      </div>
-
-      <label>Work Performed</label>
-      <textarea></textarea>
-
-      <label>Rentals</label>
-      <div class="rental-grid"></div>
-      <button onclick="addRental(this)">Add Rental</button>
-    `;
-    crewsDiv.appendChild(c);
-    renderCrew(c.querySelector("select"));
-  }
-
-  function renderCrew(sel){
-    const n=+sel.value, grid=sel.nextElementSibling;
-    grid.innerHTML="";
-    for(let i=0;i<n;i++){
-      let inp=document.createElement("input");
-      inp.placeholder=`Crew Member ${i+1}`;
-      inp.onblur=()=>saveVal(crewStore,inp.value,crewList);
-      grid.appendChild(inp);
-    }
-  }
-
-  function addRental(btn){
-    const r=document.createElement("div"); r.className="row";
-    r.innerHTML=`
-      <input placeholder="Item / Unit">
-      <input placeholder="Details (HP, qty, miles)">
-      <input placeholder="Vendor">
-      <input placeholder="PO">
-    `;
-    btn.previousElementSibling.appendChild(r);
-  }
-
-  function fmtDate(v){const d=new Date(v+"T00");return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;}
-  function fmtTime(v){if(!v)return"";let[h,m]=v.split(":");let a=h>=12?"PM":"AM";h=h%12||12;return`${String(h).padStart(2,"0")}:${m} ${a}`;}
-
-  function copyAll(){
-    let o=[];
-    if(workDate.value)o.push(`Date: ${fmtDate(workDate.value)}`);
-    if(customer.value||location.value)o.push([customer.value,location.value].filter(Boolean).join(" - "));
-    o.push("");
-
-    [...crewsDiv.children].forEach(c=>{
-      const sel=c.querySelector("select").selectedOptions[0].text;
-      const mem=[...c.querySelectorAll(".crew-members-grid input")].map(i=>i.value).filter(Boolean);
-      o.push(sel,mem.join(", "));
-
-      const [st,et]=c.querySelectorAll("input[type=time]");
-      o.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`);
-
-      const wp=c.querySelector("textarea").value;
-      if(wp)o.push("",wp);
-
-      [...c.querySelectorAll(".rental-grid .row")].forEach(r=>{
-        const [a,b,v,p]=[...r.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
-        o.push([a,b,v&&(v),p&&`PO ${p}`].filter(Boolean).join(" - "));
-      });
-      o.push("");
+function copyAll(){
+  let out=[];
+  const cust=customer.value.trim();
+  const loc=location.value.trim();
+  if(cust||loc) out.push([cust,loc].filter(Boolean).join(" - "), "");
+  [...daysDiv.children].forEach(day=>{
+    out.push(day.querySelector(".date-header").innerText);
+    [...day.querySelectorAll(".crews>div")].forEach(c=>{
+      const size=c.querySelector("select").selectedOptions[0].text;
+      const names=[...c.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean);
+      out.push(size,names.join(", "));
     });
+    out.push("");
+  });
+  navigator.clipboard.writeText(out.join("\n"));
+  alert("Copied.");
+}
 
-    navigator.clipboard.writeText(o.join("\n"));
-    alert("Copied. Paste into MobileTech.");
-  }
-
-  function clearAll(){
-    if(confirm("Clear all data?")){crewsDiv.innerHTML="";addCrew();}
-  }
-
-  addCrew();
+// Initialize first day ✅
+addDay(today());
 </script>
 </body>
 </html>
+  
