@@ -1,273 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Resolution Notes</title>
-
 <style>
-body {
-  font-family: system-ui, Arial, sans-serif;
-  background: #f8fafc;
-  margin: 0;
+body{
+  font-family: Arial, sans-serif;
+  background:#f8fafc;
+  padding:20px;
 }
-.wrapper {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
-  padding-bottom: 150px;
+.card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:16px;
 }
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 8px;
-  display: block;
-}
-input, select, textarea, button {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  font-size: 14px;
-}
-textarea { resize: vertical; }
-.hint {
-  font-size: 12px;
-  color: #6b7280;
-}
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media(max-width:600px){ .row { grid-template-columns: 1fr; } }
 
-.crew {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px;
-  margin-top: 12px;
+.crew-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
 }
-.crew-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 700;
+
+.toggle{
+  font-size:12px;
+  cursor:pointer;
 }
-.crew-body {
-  margin-top: 10px;
+
+.crew-body{
+  margin-top:10px;
 }
-.crew-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  gap: 8px;
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:8px;
 }
-.item-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap: 8px;
-  margin-top: 6px;
+
+label{
+  font-size:12px;
+  font-weight:bold;
+  display:block;
+  margin-top:10px;
 }
-.small-btn {
-  font-size: 12px;
-  padding: 8px;
+
+input, textarea, select{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ddd;
 }
-.delete-btn {
-  background: #ef4444;
-  color: #fff;
-  margin-top: 12px;
-}
-.toggle-btn {
-  font-size: 12px;
-  padding: 4px 8px;
-}
-.bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  justify-content: center;
-}
-.primary {
-  background: #0f62fe;
-  color: #fff;
+
+.item-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:6px;
+  margin-top:6px;
 }
 </style>
 </head>
 
 <body>
-<div class="wrapper">
 
-<h2>Resolution Notes</h2>
+<div class="card crew">
+  <div class="crew-header">
+    <span>Crew #1</span>
+    <span class="toggle" onclick="toggleCrew(this)">Collapse</span>
+  </div>
 
-<div class="card">
-  <label>Customer</label>
-  <input id="customer" placeholder="Customer">
-  <div class="hint">(Optional)</div>
+  <div class="crew-body">
 
-  <label>Lease / Location</label>
-  <input id="location" placeholder="Lease or Location">
-  <div class="hint">(Optional)</div>
-</div>
+    <label>Size</label>
+    <select>
+      <option>1-Man Crew</option>
+      <option>2-Man Crew</option>
+    </select>
 
-<div id="days"></div>
-</div>
+    <label>Crew Members</label>
+    <input placeholder="Crew Member 1">
 
-<div class="bottom-bar">
-  <button onclick="clearAll()">Clear All</button>
-  <button class="primary" onclick="nextDay()">Next Day</button>
-  <button onclick="copyAll()">Copy All</button>
+    <label>Start / Stop Time</label>
+    <div class="row">
+      <input type="time">
+      <input type="time">
+    </div>
+
+    <label>Work Performed</label>
+    <textarea></textarea>
+
+    <label>Rentals</label>
+    <div class="item-row">
+      <input placeholder="Item">
+      <input placeholder="Details">
+      <input placeholder="Vendor">
+      <input placeholder="PO">
+    </div>
+
+    <label>Materials</label>
+    <div class="item-row">
+      <input placeholder="Item">
+      <input placeholder="Details">
+      <input placeholder="Vendor">
+      <input placeholder="PO">
+    </div>
+
+  </div>
 </div>
 
 <script>
-const daysDiv = document.getElementById("days");
-
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-
-function addDay(date) {
-  const d = document.createElement("div");
-  d.className = "card";
-  d.innerHTML = `
-    <label>Date</label>
-    <input type="date" value="${date}">
-    <div class="crews"></div>
-    <button onclick="addCrew(this)">Add Crew</button>
-  `;
-  daysDiv.appendChild(d);
-  addCrew(d.querySelector("button"));
-}
-
-function nextDay() {
-  const lastDate = daysDiv.lastElementChild.querySelector("input[type=date]").value;
-  const nd = new Date(lastDate + "T00:00");
-  nd.setDate(nd.getDate() + 1);
-  addDay(nd.toISOString().split("T")[0]);
-}
-
-function addCrew(btn) {
-  const crews = btn.previousElementSibling;
-  const crew = document.createElement("div");
-  crew.className = "crew";
-  crews.appendChild(crew);
-  renderCrew(crew);
-  renumber(crews);
-}
-
-function renderCrew(crew) {
-  crew.innerHTML = `
-    <div class="crew-header">
-      <span class="crew-title"></span>
-      <button class="toggle-btn" onclick="toggleCrew(this)">Collapse</button>
-    </div>
-
-    <div class="crew-body">
-      <label>Size</label>
-      <select onchange="renderMembers(this)">
-        <option value="1">1-Man Crew</option>
-        <option value="2">2-Man Crew</option>
-        <option value="3">3-Man Crew</option>
-        <option value="4">4-Man Crew</option>
-        <option value="5">5-Man Crew</option>
-      </select>
-
-      <label>Crew Members</label>
-      <div class="crew-grid"></div>
-
-      <label>Start / Stop Time</label>
-      <div class="row">
-        <input type="time">
-        <input type="time">
-      </div>
-
-      <label>Work Performed</label>
-      <textarea></textarea>
-
-      <label>Rentals</label>
-      <div class="hint">(Item / Unit – details – vendor – PO)</div>
-      <div class="rentals"></div>
-      <button class="small-btn" onclick="addItem(this, 'rentals')">Add Rental</button>
-
-      <label>Materials</label>
-      <div class="hint">(Item – qty – size/spec)</div>
-      <div class="materials"></div>
-      <button class="small-btn" onclick="addItem(this, 'materials')">Add Material</button>
-
-      <button class="delete-btn" onclick="deleteCrew(this)">Delete Crew</button>
-    </div>
-  `;
-  renderMembers(crew.querySelector("select"));
-}
-
-function renderMembers(sel) {
-  const grid = sel.nextElementSibling.nextElementSibling;
-  grid.innerHTML = "";
-  for (let i = 0; i < sel.value; i++) {
-    const inp = document.createElement("input");
-    inp.placeholder = `Crew Member ${i+1}`;
-    grid.appendChild(inp);
-  }
-}
-
-function toggleCrew(btn) {
-  const body = btn.closest(".crew").querySelector(".crew-body");
-  if (body.style.display === "none") {
-    body.style.display = "";
-    btn.textContent = "Collapse";
+function toggleCrew(el){
+  const body = el.closest(".crew").querySelector(".crew-body");
+  if(body.style.display==="none"){
+    body.style.display="";
+    el.textContent="Collapse";
   } else {
-    body.style.display = "none";
-    btn.textContent = "Expand";
-  }
-}
-
-function deleteCrew(btn) {
-  const crews = btn.closest(".crews");
-  btn.closest(".crew").remove();
-  renumber(crews);
-}
-
-function renumber(crews) {
-  [...crews.querySelectorAll(".crew")].forEach((c, i) => {
-    c.querySelector(".crew-title").textContent = `Crew #${i+1}`;
-  });
-}
-
-function addItem(btn, cls) {
-  const row = document.createElement("div");
-  row.className = "item-row";
-  row.innerHTML = `
-    <input placeholder="Item / Unit">
-    <input placeholder="Details">
-    <input placeholder="Vendor">
-    <input placeholder="PO">
-  `;
-  btn.previousElementSibling.appendChild(row);
-}
-
-function copyAll() {
-  alert("Copy logic unchanged and still valid.");
-}
-
-function clearAll() {
-  if (confirm("Clear all entries?")) {
-    daysDiv.innerHTML = "";
-    addDay(today());
-  }
-}
-
-addDay(today());
-</script>
-</body
+    body.style.display
