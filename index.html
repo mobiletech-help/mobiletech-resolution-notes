@@ -26,12 +26,29 @@
       max-width: 900px;
       margin: 0 auto;
       padding: 16px;
-      padding-bottom: 120px;
+      padding-bottom: 140px;
     }
 
     h1 {
       font-size: 20px;
+      margin: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 12px;
+    }
+
+    .help-btn {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      cursor: pointer;
     }
 
     .card {
@@ -49,7 +66,7 @@
       margin-top: 8px;
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       box-sizing: border-box;
       padding: 10px;
@@ -61,7 +78,7 @@
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 80px;
       resize: vertical;
     }
 
@@ -71,21 +88,23 @@
       margin-top: 4px;
     }
 
-    .crew-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 12px;
     }
 
     @media (max-width: 600px) {
       .row {
         grid-template-columns: 1fr;
       }
+    }
+
+    .crew-members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .bottom-bar {
@@ -97,168 +116,247 @@
       border-top: 1px solid var(--border);
       padding: 10px;
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: center;
       z-index: 10;
     }
 
     button {
-      padding: 10px 16px;
       border-radius: 6px;
       border: 1px solid var(--border);
-      background: #FFFFFF;
       font-weight: 600;
-      font-size: 14px;
+      padding: 10px 16px;
+      background: #FFFFFF;
     }
 
     button.primary {
       background: var(--primary);
+      color: white;
       border-color: var(--primary);
-      color: #FFFFFF;
+    }
+
+    /* HELP PANEL */
+    .help-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      z-index: 30;
+    }
+
+    .help-panel {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: min(420px, 100%);
+      height: 100%;
+      background: #fff;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .help-close {
+      text-align: right;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Rental rows */
+    .rental-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .remove-btn {
+      background: #f87171;
+      color: white;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
-
 <div class="wrapper">
-  <h1>MobileTech Resolution Notes</h1>
 
-  <!-- DATE -->
-  <div class="card">
-    <label>Date (work performed)</label>
-    <input type="date" id="workDate">
-    <div class="hint">(Copied as MM/DD/YY)</div>
+  <div class="top-bar">
+    <h1>MobileTech Resolution Notes</h1>
+    <button class="help-btn" onclick="openHelp()">Help</button>
   </div>
 
-  <!-- CREWS -->
+  <!-- Smartfill lists -->
+  <datalist id="crewList"></datalist>
+  <datalist id="customerList"></datalist>
+  <datalist id="locationList"></datalist>
+
+  <!-- JOB INFO -->
+  <div class="card">
+    <label>Date (work performed)</label>
+    <div class="row">
+      <input type="date" id="workDate">
+      <button type="button" onclick="nextDay()">Next Day</button>
+    </div>
+    <div class="hint">(Next Day advances date and resets crews)</div>
+
+    <div class="row">
+      <div>
+        <label>Customer</label>
+        <input id="customer" list="customerList">
+      </div>
+      <div>
+        <label>Lease / Location</label>
+        <input id="location" list="locationList">
+      </div>
+    </div>
+  </div>
+
   <div id="crews"></div>
+
 </div>
 
-<!-- BOTTOM BUTTONS -->
 <div class="bottom-bar">
   <button class="primary" onclick="addCrew()">Add Crew</button>
   <button onclick="copyAll()">Copy All</button>
   <button onclick="clearAll()">Clear All</button>
 </div>
 
+<!-- HELP PANEL -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelp()">
+  <div class="help-panel" onclick="event.stopPropagation()">
+    <div class="help-close" onclick="closeHelp()">Close ✕</div>
+    <p>Use this page to generate daily MobileTech Resolution Notes. Nothing is saved.</p>
+    <p><strong>Next Day</strong> starts a new day and clears crews.</p>
+    <p>Rentals & Materials copy cleanly with no labels.</p>
+  </div>
+</div>
+
 <script>
-  let crewCount = 0;
-  const crewsDiv = document.getElementById("crews");
+  const crewStore="crewMemory", custStore="custMemory", locStore="locMemory";
+  const crewList=document.getElementById("crewList");
+  const customerList=document.getElementById("customerList");
+  const locationList=document.getElementById("locationList");
+  const crewsDiv=document.getElementById("crews");
 
-  function addCrew() {
-    crewCount++;
+  function loadList(key, list){
+    const a=JSON.parse(localStorage.getItem(key)||"[]"); list.innerHTML="";
+    a.forEach(v=>{let o=document.createElement("option");o.value=v;list.appendChild(o);});
+  }
+  function saveVal(key,v,list){
+    v=v.trim(); if(!v) return;
+    let a=JSON.parse(localStorage.getItem(key)||"[]");
+    if(!a.includes(v)){a.push(v);localStorage.setItem(key,JSON.stringify(a));loadList(key,list);}
+  }
 
-    const card = document.createElement("div");
-    card.className = "card";
+  customer.addEventListener("blur",()=>saveVal(custStore,customer.value,customerList));
+  location.addEventListener("blur",()=>saveVal(locStore,location.value,locationList));
 
-    card.innerHTML = `
-      <div class="crew-title">Crew #${crewCount}</div>
+  loadList(custStore,customerList);
+  loadList(locStore,locationList);
 
-      <label>Crew Members</label>
-      <input>
+  function openHelp(){helpOverlay.style.display="block";}
+  function closeHelp(){helpOverlay.style.display="none";}
 
-      <label>Truck(s)</label>
-      <input>
+  function nextDay(){
+    const d=workDate.value?new Date(workDate.value+"T00:00"):new Date();
+    d.setDate(d.getDate()+1);
+    workDate.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    crewsDiv.innerHTML=""; addCrew();
+  }
 
+  function addCrew(){
+    const c=document.createElement("div"); c.className="card";
+    c.innerHTML=`
+      <label>Crew Size</label>
+      <select onchange="renderCrew(this)">
+        <option value="1">1‑Man Crew</option>
+        <option value="2">2‑Man Crew</option>
+        <option value="3">3‑Man Crew</option>
+        <option value="4">4‑Man Crew</option>
+        <option value="5">5‑Man Crew</option>
+      </select>
+      <div class="crew-members-grid"></div>
+
+      <label>Start / Stop Time</label>
       <div class="row">
-        <div>
-          <label>Start Time</label>
-          <input type="time">
-        </div>
-        <div>
-          <label>Stop Time</label>
-          <input type="time">
-        </div>
+        <input type="time">
+        <input type="time">
       </div>
 
       <label>Work Performed</label>
-      <div class="hint">
-        (Be specific — work completed, travel, standby, weather delays, and additional work requested.)
-      </div>
       <textarea></textarea>
 
-      <label>Equipment on Rent (if applicable)</label>
-      <div class="hint">
-        (Unit #, vendor, PO #, footage / mileage — one item per line.)
-      </div>
-      <textarea></textarea>
+      <label>Rentals</label>
+      <div class="rental-grid"></div>
+      <button onclick="addRental(this)">Add Rental</button>
     `;
-
-    crewsDiv.appendChild(card);
+    crewsDiv.appendChild(c);
+    renderCrew(c.querySelector("select"));
   }
 
-  function formatDate(value) {
-    if (!value) return "";
-    const d = new Date(value + "T00:00:00");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    const yy = String(d.getFullYear()).slice(-2);
-    return `${mm}/${dd}/${yy}`;
-  }
-
-  function formatTime(value) {
-    if (!value) return "";
-    const [hour, minute] = value.split(":").map(Number);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const h12 = hour % 12 || 12;
-    return `${String(h12).padStart(2, "0")}:${minute
-      .toString()
-      .padStart(2, "0")} ${ampm}`;
-  }
-
-  function copyAll() {
-    let output = [];
-
-    const dateVal = formatDate(document.getElementById("workDate").value);
-    if (dateVal) {
-      output.push(`Date: ${dateVal}`, "");
+  function renderCrew(sel){
+    const n=+sel.value, grid=sel.nextElementSibling;
+    grid.innerHTML="";
+    for(let i=0;i<n;i++){
+      let inp=document.createElement("input");
+      inp.placeholder=`Crew Member ${i+1}`;
+      inp.onblur=()=>saveVal(crewStore,inp.value,crewList);
+      grid.appendChild(inp);
     }
+  }
 
-    Array.from(crewsDiv.children).forEach((crew, i) => {
-      const fields = crew.querySelectorAll("input, textarea");
+  function addRental(btn){
+    const r=document.createElement("div"); r.className="row";
+    r.innerHTML=`
+      <input placeholder="Item / Unit">
+      <input placeholder="Details (HP, qty, miles)">
+      <input placeholder="Vendor">
+      <input placeholder="PO">
+    `;
+    btn.previousElementSibling.appendChild(r);
+  }
 
-      output.push(`Crew #${i + 1}`);
-      output.push(`Crew Members: ${fields[0].value}`);
+  function fmtDate(v){const d=new Date(v+"T00");return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;}
+  function fmtTime(v){if(!v)return"";let[h,m]=v.split(":");let a=h>=12?"PM":"AM";h=h%12||12;return`${String(h).padStart(2,"0")}:${m} ${a}`;}
 
-      if (fields[1].value.trim()) {
-        output.push(`Truck(s): ${fields[1].value}`);
-      }
+  function copyAll(){
+    let o=[];
+    if(workDate.value)o.push(`Date: ${fmtDate(workDate.value)}`);
+    if(customer.value||location.value)o.push([customer.value,location.value].filter(Boolean).join(" - "));
+    o.push("");
 
-      output.push(
-        `Start Time: ${formatTime(fields[2].value)}`,
-        `Stop Time: ${formatTime(fields[3].value)}`,
-        "",
-        "Work Performed:",
-        fields[4].value
-      );
+    [...crewsDiv.children].forEach(c=>{
+      const sel=c.querySelector("select").selectedOptions[0].text;
+      const mem=[...c.querySelectorAll(".crew-members-grid input")].map(i=>i.value).filter(Boolean);
+      o.push(sel,mem.join(", "));
 
-      if (fields[5].value.trim()) {
-        output.push(
-          "",
-          "Equipment on Rent (if applicable):",
-          fields[5].value
-        );
-      }
+      const [st,et]=c.querySelectorAll("input[type=time]");
+      o.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`);
 
-      output.push("");
+      const wp=c.querySelector("textarea").value;
+      if(wp)o.push("",wp);
+
+      [...c.querySelectorAll(".rental-grid .row")].forEach(r=>{
+        const [a,b,v,p]=[...r.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
+        o.push([a,b,v&&(v),p&&`PO ${p}`].filter(Boolean).join(" - "));
+      });
+      o.push("");
     });
 
-    navigator.clipboard.writeText(output.join("\n"));
+    navigator.clipboard.writeText(o.join("\n"));
     alert("Copied. Paste into MobileTech.");
   }
 
-  function clearAll() {
-    if (confirm("Clear all crews?")) {
-      crewsDiv.innerHTML = "";
-      crewCount = 0;
-      addCrew();
-    }
+  function clearAll(){
+    if(confirm("Clear all data?")){crewsDiv.innerHTML="";addCrew();}
   }
 
-  // Initialize with one crew
   addCrew();
 </script>
-
 </body>
 </html>
