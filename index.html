@@ -6,70 +6,84 @@
 <title>MobileTech Resolution Notes</title>
 
 <style>
-:root {
+:root{
   --primary:#0F62FE;
   --border:#E5E7EB;
   --bg:#F8FAFC;
   --card:#FFFFFF;
   --muted:#6B7280;
 }
-body {
+body{
   margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
   background:var(--bg);
 }
-.wrapper {
+.wrapper{
   max-width:900px;
   margin:auto;
   padding:16px;
-  padding-bottom:140px;
+  padding-bottom:150px;
 }
-h1 {font-size:20px;margin-bottom:8px;}
-.card {
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+h1{font-size:20px;margin:0;}
+.help-btn{
+  font-size:13px;
+  padding:6px 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:#fff;
+  cursor:pointer;
+}
+.card{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:8px;
   padding:12px;
   margin-bottom:16px;
 }
-label {
+label{
   font-size:12px;
   font-weight:600;
-  margin-top:8px;
   display:block;
+  margin-top:8px;
 }
-input, textarea, select, button {
+input,textarea,select,button{
   width:100%;
   padding:10px;
   border-radius:6px;
   border:1px solid var(--border);
   font-size:14px;
 }
-textarea {resize:vertical;}
-.hint {
+textarea{resize:vertical;}
+.hint{
   font-size:12px;
   color:var(--muted);
   margin-top:4px;
 }
-.row {
+.row{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
 @media(max-width:600px){.row{grid-template-columns:1fr}}
 
-.crew-grid {
+.crew-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
   margin-top:6px;
 }
-.divider {
+.divider{
   height:1px;
   background:var(--border);
   margin:12px 0;
 }
-.bottom-bar {
+.bottom-bar{
   position:fixed;
   bottom:0;
   left:0;
@@ -81,26 +95,51 @@ textarea {resize:vertical;}
   background:#fff;
   border-top:1px solid var(--border);
 }
-.primary {
+.primary{
   background:var(--primary);
   color:#fff;
   border-color:var(--primary);
 }
-.item-row {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:8px;
-  margin-top:6px;
-}
-.delete-btn {
+.delete-btn{
   background:#ef4444;
   color:#fff;
   border-color:#ef4444;
   margin-top:10px;
 }
-.small-btn {
+.small-btn{
   font-size:12px;
   padding:8px;
+}
+.item-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:8px;
+  margin-top:6px;
+}
+
+/* HELP PANEL */
+.help-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  display:none;
+  z-index:50;
+}
+.help-panel{
+  position:absolute;
+  right:0;
+  top:0;
+  width:min(420px,100%);
+  height:100%;
+  background:#fff;
+  padding:16px;
+  overflow-y:auto;
+}
+.help-close{
+  text-align:right;
+  font-weight:600;
+  color:var(--primary);
+  cursor:pointer;
 }
 </style>
 </head>
@@ -108,9 +147,12 @@ textarea {resize:vertical;}
 <body>
 <div class="wrapper">
 
-<h1>MobileTech Resolution Notes</h1>
+<div class="top-bar">
+  <h1>MobileTech Resolution Notes</h1>
+  <button class="help-btn" onclick="openHelp()">Help</button>
+</div>
 
-<!-- Job Header -->
+<!-- HEADER -->
 <div class="card">
   <label>Customer</label>
   <input id="customer" placeholder="Customer">
@@ -122,54 +164,73 @@ textarea {resize:vertical;}
 </div>
 
 <div id="days"></div>
-
 </div>
 
 <div class="bottom-bar">
+  <button onclick="clearAll()">Clear All</button>
   <button class="primary" onclick="nextDay()">Next Day</button>
   <button onclick="copyAll()">Copy All</button>
 </div>
 
+<!-- HELP PANEL -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelp()">
+  <div class="help-panel" onclick="event.stopPropagation()">
+    <div class="help-close" onclick="closeHelp()">Close ✕</div>
+
+    <h3>How this page works</h3>
+    <p>This page helps you build clean resolution notes for MobileTech.</p>
+
+    <h3>Dates & Crews</h3>
+    <p>Each date starts fresh with Crew #1. Use <strong>Next Day</strong> to continue a multi‑day job.</p>
+
+    <h3>Optional Fields</h3>
+    <p>Customer, Lease/Location, Rentals, and Materials are optional. Leave them blank if not used.</p>
+
+    <h3>Copying Notes</h3>
+    <p>Use <strong>Copy All</strong> to paste everything into MobileTech. Nothing is saved here.</p>
+  </div>
+</div>
+
 <script>
-const daysDiv = document.getElementById("days");
+const daysDiv=document.getElementById("days");
 
-function today(){
-  return new Date().toISOString().split("T")[0];
-}
+/* HELP */
+function openHelp(){helpOverlay.style.display="block";}
+function closeHelp(){helpOverlay.style.display="none";}
 
+/* DATE */
+function today(){return new Date().toISOString().split("T")[0];}
 function addDay(date){
-  const card=document.createElement("div");
-  card.className="card day";
-  card.innerHTML=`
+  const c=document.createElement("div");
+  c.className="card day";
+  c.innerHTML=`
     <label>Date</label>
     <input type="date" value="${date}">
     <div class="divider"></div>
     <div class="crews"></div>
     <button onclick="addCrew(this)">Add Crew</button>
   `;
-  daysDiv.appendChild(card);
-  addCrew(card.querySelector("button")); // Crew #1 automatic
+  daysDiv.appendChild(c);
+  addCrew(c.querySelector("button"));
 }
-
 function nextDay(){
-  const lastDate = daysDiv.lastElementChild
-    .querySelector("input[type=date]").value;
-  const d=new Date(lastDate+"T00:00");
+  const last=daysDiv.lastElementChild.querySelector("input[type=date]").value;
+  const d=new Date(last+"T00:00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
   daysDiv.lastElementChild.scrollIntoView({behavior:"smooth"});
 }
 
+/* CREWS */
 function addCrew(btn){
   const crews=btn.previousElementSibling;
-  const c=document.createElement("div");
-  c.className="card crew";
-  crews.appendChild(c);
-  renderCrewCard(c);
+  const crew=document.createElement("div");
+  crew.className="card crew";
+  crews.appendChild(crew);
+  renderCrew(crew);
   renumberCrews(crews);
 }
-
-function renderCrewCard(c){
+function renderCrew(c){
   c.innerHTML=`
     <div class="crew-title"></div>
 
@@ -186,34 +247,15 @@ function renderCrewCard(c){
     <div class="crew-grid"></div>
 
     <label>Start Time / Stop Time</label>
-    <div class="row">
-      <div>
-        <input type="time"><div class="hint">Start Time</div>
-      </div>
-      <div>
-        <input type="time"><div class="hint">Stop Time</div>
-      </div>
-    </div>
+    <div class="row"><input type="time"><input type="time"></div>
 
     <label>Work Performed</label>
-    <div class="hint">(Work completed, travel, standby, weather delays, additional work requested.)</div>
     <textarea></textarea>
-
-    <label>Rentals (if applicable)</label>
-    <div class="hint">(Item / Unit – details like HP, qty, mileage – vendor – PO)</div>
-    <div class="rentals"></div>
-    <button class="small-btn" onclick="addItem(this)">Add Rental</button>
-
-    <label>Materials (if applicable)</label>
-    <div class="hint">(Materials used and sold to customer – item, qty, size/spec.)</div>
-    <div class="materials"></div>
-    <button class="small-btn" onclick="addItem(this)">Add Material</button>
 
     <button class="delete-btn" onclick="deleteCrew(this)">Delete Crew</button>
   `;
   renderCrewMembers(c.querySelector("select"));
 }
-
 function renderCrewMembers(sel){
   const grid=sel.nextElementSibling.nextElementSibling;
   grid.innerHTML="";
@@ -223,69 +265,40 @@ function renderCrewMembers(sel){
     grid.appendChild(inp);
   }
 }
-
-function addItem(btn){
-  const row=document.createElement("div");
-  row.className="item-row";
-  row.innerHTML=`
-    <input placeholder="Item / Unit">
-    <input placeholder="Details">
-    <input placeholder="Vendor">
-    <input placeholder="PO">
-  `;
-  btn.previousElementSibling.appendChild(row);
-}
-
 function deleteCrew(btn){
   const crews=btn.closest(".crews");
   btn.closest(".crew").remove();
   renumberCrews(crews);
 }
-
 function renumberCrews(crews){
   [...crews.querySelectorAll(".crew")].forEach((c,i)=>{
-    c.querySelector(".crew-title").innerText = `Crew #${i+1}`;
+    c.querySelector(".crew-title").innerText=`Crew #${i+1}`;
   });
 }
 
+/* COPY */
 function fmtDate(v){
   const d=new Date(v+"T00:00");
   return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
 }
 function fmtTime(v){
-  if(!v)return "";
-  let[h,m]=v.split(":");
-  const ap=h>=12?"PM":"AM";
-  h=h%12||12;
-  return `${String(h).padStart(2,"0")}:${m} ${ap}`;
+  if(!v)return"";
+  let[h,m]=v.split(":");const ap=h>=12?"PM":"AM";h=h%12||12;
+  return`${String(h).padStart(2,"0")}:${m} ${ap}`;
 }
-
 function copyAll(){
   let out=[];
-  const cust=customer.value.trim();
-  const loc=location.value.trim();
-  if(cust||loc) out.push([cust,loc].filter(Boolean).join(" - "),"");
+  const c=customer.value.trim(),l=location.value.trim();
+  if(c||l) out.push([c,l].filter(Boolean).join(" - "),"");
 
   [...daysDiv.children].forEach(day=>{
     out.push(fmtDate(day.querySelector("input[type=date]").value));
-    [...day.querySelectorAll(".crew")].forEach(c=>{
-      const size=c.querySelector("select").selectedOptions[0].text;
-      const names=[...c.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean);
+    [...day.querySelectorAll(".crew")].forEach(cr=>{
+      const size=cr.querySelector("select").selectedOptions[0].text;
+      const names=[...cr.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean);
       out.push(size,names.join(", "));
-      const [st,et]=c.querySelectorAll("input[type=time]");
-      out.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`);
-      const wp=c.querySelector("textarea").value.trim();
-      if(wp) out.push("",wp);
-
-      [...c.querySelectorAll(".rentals .item-row")].forEach(r=>{
-        const parts=[...r.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
-        if(parts.length) out.push(parts.join(" - "));
-      });
-      [...c.querySelectorAll(".materials .item-row")].forEach(m=>{
-        const parts=[...m.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
-        if(parts.length) out.push(parts.join(" - "));
-      });
-      out.push("");
+      const [st,et]=cr.querySelectorAll("input[type=time]");
+      out.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`, "");
     });
   });
 
@@ -293,6 +306,15 @@ function copyAll(){
   alert("Copied. Paste into MobileTech.");
 }
 
+/* CLEAR ALL */
+function clearAll(){
+  if(confirm("Clear all days and crews?")){
+    daysDiv.innerHTML="";
+    addDay(today());
+  }
+}
+
+/* INIT */
 addDay(today());
 </script>
 </body>
