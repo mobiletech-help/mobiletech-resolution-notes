@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,6 +11,7 @@
   --border:#E5E7EB;
   --bg:#F8FAFC;
   --card:#FFFFFF;
+  --muted:#6B7280;
 }
 body {
   margin:0;
@@ -23,7 +24,7 @@ body {
   padding:16px;
   padding-bottom:140px;
 }
-h1{font-size:20px;margin:0;}
+h1 {font-size:20px;margin-bottom:8px;}
 .card {
   background:var(--card);
   border:1px solid var(--border);
@@ -34,8 +35,8 @@ h1{font-size:20px;margin:0;}
 label {
   font-size:12px;
   font-weight:600;
+  margin-top:8px;
   display:block;
-  margin-top:6px;
 }
 input, textarea, select, button {
   width:100%;
@@ -45,6 +46,11 @@ input, textarea, select, button {
   font-size:14px;
 }
 textarea {resize:vertical;}
+.hint {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
 .row {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -55,11 +61,7 @@ textarea {resize:vertical;}
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
-  margin-top:8px;
-}
-.date-header {
-  font-weight:700;
-  margin-bottom:6px;
+  margin-top:6px;
 }
 .divider {
   height:1px;
@@ -83,26 +85,47 @@ textarea {resize:vertical;}
   color:#fff;
   border-color:var(--primary);
 }
+
+/* Rentals & Materials */
+.item-row {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:8px;
+  margin-top:6px;
+}
+.small-btn {
+  font-size:12px;
+  padding:8px;
+}
+.delete-btn {
+  background:#ef4444;
+  color:#fff;
+  border-color:#ef4444;
+}
 </style>
 </head>
 
 <body>
 <div class="wrapper">
-  <h1>MobileTech Resolution Notes</h1>
 
-  <datalist id="crewList"></datalist>
-  <datalist id="customerList"></datalist>
-  <datalist id="locationList"></datalist>
+<h1>MobileTech Resolution Notes</h1>
 
-  <div class="card">
-    <label>Customer & Lease</label>
-    <div class="row">
-      <input id="customer" list="customerList" placeholder="Customer">
-      <input id="location" list="locationList" placeholder="Lease / Location">
-    </div>
+<datalist id="crewList"></datalist>
+<datalist id="customerList"></datalist>
+<datalist id="locationList"></datalist>
+
+<!-- Job header -->
+<div class="card">
+  <label>Customer & Lease / Location</label>
+  <div class="row">
+    <input id="customer" list="customerList" placeholder="Customer">
+    <input id="location" list="locationList" placeholder="Lease / Location">
   </div>
+  <div class="hint">(Copied as: Customer - Lease/Location)</div>
+</div>
 
-  <div id="days"></div>
+<div id="days"></div>
+
 </div>
 
 <div class="bottom-bar">
@@ -112,24 +135,28 @@ textarea {resize:vertical;}
 
 <script>
 const daysDiv = document.getElementById("days");
-const today = () => new Date().toISOString().split("T")[0];
+
+function today(){
+  return new Date().toISOString().split("T")[0];
+}
 
 function addDay(date){
   const card=document.createElement("div");
   card.className="card";
   card.innerHTML=`
-    <div class="date-header">${date}</div>
+    <label>Date</label>
+    <input type="date" value="${date}">
     <div class="divider"></div>
     <div class="crews"></div>
     <button onclick="addCrew(this)">Add Crew</button>
   `;
   daysDiv.appendChild(card);
-  addCrew(card.querySelector("button")); // ✅ Crew #1 automatic
+  addCrew(card.querySelector("button")); // Crew #1 automatic
 }
 
 function nextDay(){
-  const last = daysDiv.lastElementChild;
-  const lastDate = last.querySelector(".date-header").innerText;
+  const last=daysDiv.lastElementChild;
+  const lastDate=last.querySelector("input[type=date]").value;
   const d=new Date(lastDate+"T00:00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
@@ -139,35 +166,96 @@ function nextDay(){
 function addCrew(btn){
   const crews=btn.previousElementSibling;
   const crewNum=crews.children.length+1;
+
   const c=document.createElement("div");
+  c.className="card";
   c.innerHTML=`
-    <label>Crew #${crewNum} Size</label>
-    <select onchange="renderCrew(this)">
-      <option value="1">1-Man Crew</option>
-      <option value="2">2-Man Crew</option>
-      <option value="3">3-Man Crew</option>
-      <option value="4">4-Man Crew</option>
-      <option value="5">5-Man Crew</option>
-    </select>
-    <div class="crew-grid"></div>
     <div class="row">
-      <input type="time"><input type="time">
+      <label>Crew #${crewNum} Size</label>
+      <button class="delete-btn small-btn" onclick="deleteCrew(this)">Delete Crew</button>
     </div>
+
+    <select onchange="renderCrew(this)">
+      <option value="1">1‑Man Crew</option>
+      <option value="2">2‑Man Crew</option>
+      <option value="3">3‑Man Crew</option>
+      <option value="4">4‑Man Crew</option>
+      <option value="5">5‑Man Crew</option>
+    </select>
+
+    <label>Crew Members</label>
+    <div class="crew-grid"></div>
+    <div class="hint">(One name per box)</div>
+
+    <label>Start Time / Stop Time</label>
+    <div class="row">
+      <div>
+        <input type="time">
+        <div class="hint">Start Time</div>
+      </div>
+      <div>
+        <input type="time">
+        <div class="hint">Stop Time</div>
+      </div>
+    </div>
+
     <label>Work Performed</label>
+    <div class="hint">(Work completed, travel, standby, weather delays, additional work requested.)</div>
     <textarea></textarea>
+
+    <label>Rentals (if applicable)</label>
+    <div class="hint">(Item / Unit – details like HP, qty, mileage – vendor – PO)</div>
+    <div class="rentals"></div>
+    <button class="small-btn" onclick="addItem(this,'rentals')">Add Rental</button>
+
+    <label>Materials (if applicable)</label>
+    <div class="hint">(Materials used and sold to customer – item, qty, size/spec.)</div>
+    <div class="materials"></div>
+    <button class="small-btn" onclick="addItem(this,'materials')">Add Material</button>
   `;
   crews.appendChild(c);
   renderCrew(c.querySelector("select"));
 }
 
+function deleteCrew(btn){
+  if(confirm("Delete this crew?")){
+    btn.closest(".card").remove();
+  }
+}
+
 function renderCrew(sel){
-  const grid=sel.nextElementSibling;
+  const grid=sel.nextElementSibling.nextElementSibling;
   grid.innerHTML="";
   for(let i=0;i<sel.value;i++){
     const inp=document.createElement("input");
-    inp.placeholder="Crew Member";
+    inp.placeholder=`Crew Member ${i+1}`;
     grid.appendChild(inp);
   }
+}
+
+function addItem(btn,type){
+  const container = btn.previousElementSibling;
+  const row=document.createElement("div");
+  row.className="item-row";
+  row.innerHTML=`
+    <input placeholder="Item / Unit">
+    <input placeholder="Details (HP, qty, miles)">
+    <input placeholder="Vendor">
+    <input placeholder="PO">
+  `;
+  container.appendChild(row);
+}
+
+function fmtDate(v){
+  const d=new Date(v+"T00:00");
+  return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
+}
+function fmtTime(v){
+  if(!v)return "";
+  let[h,m]=v.split(":");
+  const ap=h>=12?"PM":"AM";
+  h=h%12||12;
+  return `${String(h).padStart(2,"0")}:${m} ${ap}`;
 }
 
 function copyAll(){
@@ -175,22 +263,41 @@ function copyAll(){
   const cust=customer.value.trim();
   const loc=location.value.trim();
   if(cust||loc) out.push([cust,loc].filter(Boolean).join(" - "), "");
+
   [...daysDiv.children].forEach(day=>{
-    out.push(day.querySelector(".date-header").innerText);
-    [...day.querySelectorAll(".crews>div")].forEach(c=>{
+    const date=day.querySelector("input[type=date]").value;
+    out.push(fmtDate(date));
+
+    [...day.querySelectorAll(".crews>.card")].forEach(c=>{
       const size=c.querySelector("select").selectedOptions[0].text;
       const names=[...c.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean);
-      out.push(size,names.join(", "));
+      out.push(size, names.join(", "));
+
+      const [st,et]=c.querySelectorAll("input[type=time]");
+      out.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`);
+
+      const wp=c.querySelector("textarea").value.trim();
+      if(wp) out.push("", wp);
+
+      [...c.querySelectorAll(".rentals .item-row")].forEach(r=>{
+        const parts=[...r.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
+        if(parts.length) out.push(parts.join(" - "));
+      });
+
+      [...c.querySelectorAll(".materials .item-row")].forEach(m=>{
+        const parts=[...m.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
+        if(parts.length) out.push(parts.join(" - "));
+      });
+
+      out.push("");
     });
-    out.push("");
   });
+
   navigator.clipboard.writeText(out.join("\n"));
-  alert("Copied.");
+  alert("Copied. Paste into MobileTech.");
 }
 
-// Initialize first day ✅
 addDay(today());
 </script>
 </body>
 </html>
-  
