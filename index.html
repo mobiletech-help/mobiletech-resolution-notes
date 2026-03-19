@@ -57,6 +57,7 @@ textarea {resize:vertical;}
   gap:12px;
 }
 @media(max-width:600px){.row{grid-template-columns:1fr}}
+
 .crew-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
@@ -85,22 +86,21 @@ textarea {resize:vertical;}
   color:#fff;
   border-color:var(--primary);
 }
-
-/* Rentals & Materials */
 .item-row {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
   gap:8px;
   margin-top:6px;
 }
-.small-btn {
-  font-size:12px;
-  padding:8px;
-}
 .delete-btn {
   background:#ef4444;
   color:#fff;
   border-color:#ef4444;
+  margin-top:10px;
+}
+.small-btn {
+  font-size:12px;
+  padding:8px;
 }
 </style>
 </head>
@@ -110,18 +110,15 @@ textarea {resize:vertical;}
 
 <h1>MobileTech Resolution Notes</h1>
 
-<datalist id="crewList"></datalist>
-<datalist id="customerList"></datalist>
-<datalist id="locationList"></datalist>
-
-<!-- Job header -->
+<!-- Job Header -->
 <div class="card">
-  <label>Customer & Lease / Location</label>
-  <div class="row">
-    <input id="customer" list="customerList" placeholder="Customer">
-    <input id="location" list="locationList" placeholder="Lease / Location">
-  </div>
-  <div class="hint">(Copied as: Customer - Lease/Location)</div>
+  <label>Customer</label>
+  <input id="customer" placeholder="Customer">
+  <div class="hint">(Optional)</div>
+
+  <label>Lease / Location</label>
+  <input id="location" placeholder="Lease or Location">
+  <div class="hint">(Optional)</div>
 </div>
 
 <div id="days"></div>
@@ -142,7 +139,7 @@ function today(){
 
 function addDay(date){
   const card=document.createElement("div");
-  card.className="card";
+  card.className="card day";
   card.innerHTML=`
     <label>Date</label>
     <input type="date" value="${date}">
@@ -155,8 +152,8 @@ function addDay(date){
 }
 
 function nextDay(){
-  const last=daysDiv.lastElementChild;
-  const lastDate=last.querySelector("input[type=date]").value;
+  const lastDate = daysDiv.lastElementChild
+    .querySelector("input[type=date]").value;
   const d=new Date(lastDate+"T00:00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
@@ -165,17 +162,19 @@ function nextDay(){
 
 function addCrew(btn){
   const crews=btn.previousElementSibling;
-  const crewNum=crews.children.length+1;
-
   const c=document.createElement("div");
-  c.className="card";
-  c.innerHTML=`
-    <div class="row">
-      <label>Crew #${crewNum} Size</label>
-      <button class="delete-btn small-btn" onclick="deleteCrew(this)">Delete Crew</button>
-    </div>
+  c.className="card crew";
+  crews.appendChild(c);
+  renderCrewCard(c);
+  renumberCrews(crews);
+}
 
-    <select onchange="renderCrew(this)">
+function renderCrewCard(c){
+  c.innerHTML=`
+    <div class="crew-title"></div>
+
+    <label>Size</label>
+    <select onchange="renderCrewMembers(this)">
       <option value="1">1‑Man Crew</option>
       <option value="2">2‑Man Crew</option>
       <option value="3">3‑Man Crew</option>
@@ -185,17 +184,14 @@ function addCrew(btn){
 
     <label>Crew Members</label>
     <div class="crew-grid"></div>
-    <div class="hint">(One name per box)</div>
 
     <label>Start Time / Stop Time</label>
     <div class="row">
       <div>
-        <input type="time">
-        <div class="hint">Start Time</div>
+        <input type="time"><div class="hint">Start Time</div>
       </div>
       <div>
-        <input type="time">
-        <div class="hint">Stop Time</div>
+        <input type="time"><div class="hint">Stop Time</div>
       </div>
     </div>
 
@@ -206,24 +202,19 @@ function addCrew(btn){
     <label>Rentals (if applicable)</label>
     <div class="hint">(Item / Unit – details like HP, qty, mileage – vendor – PO)</div>
     <div class="rentals"></div>
-    <button class="small-btn" onclick="addItem(this,'rentals')">Add Rental</button>
+    <button class="small-btn" onclick="addItem(this)">Add Rental</button>
 
     <label>Materials (if applicable)</label>
     <div class="hint">(Materials used and sold to customer – item, qty, size/spec.)</div>
     <div class="materials"></div>
-    <button class="small-btn" onclick="addItem(this,'materials')">Add Material</button>
+    <button class="small-btn" onclick="addItem(this)">Add Material</button>
+
+    <button class="delete-btn" onclick="deleteCrew(this)">Delete Crew</button>
   `;
-  crews.appendChild(c);
-  renderCrew(c.querySelector("select"));
+  renderCrewMembers(c.querySelector("select"));
 }
 
-function deleteCrew(btn){
-  if(confirm("Delete this crew?")){
-    btn.closest(".card").remove();
-  }
-}
-
-function renderCrew(sel){
+function renderCrewMembers(sel){
   const grid=sel.nextElementSibling.nextElementSibling;
   grid.innerHTML="";
   for(let i=0;i<sel.value;i++){
@@ -233,17 +224,28 @@ function renderCrew(sel){
   }
 }
 
-function addItem(btn,type){
-  const container = btn.previousElementSibling;
+function addItem(btn){
   const row=document.createElement("div");
   row.className="item-row";
   row.innerHTML=`
     <input placeholder="Item / Unit">
-    <input placeholder="Details (HP, qty, miles)">
+    <input placeholder="Details">
     <input placeholder="Vendor">
     <input placeholder="PO">
   `;
-  container.appendChild(row);
+  btn.previousElementSibling.appendChild(row);
+}
+
+function deleteCrew(btn){
+  const crews=btn.closest(".crews");
+  btn.closest(".crew").remove();
+  renumberCrews(crews);
+}
+
+function renumberCrews(crews){
+  [...crews.querySelectorAll(".crew")].forEach((c,i)=>{
+    c.querySelector(".crew-title").innerText = `Crew #${i+1}`;
+  });
 }
 
 function fmtDate(v){
@@ -262,33 +264,27 @@ function copyAll(){
   let out=[];
   const cust=customer.value.trim();
   const loc=location.value.trim();
-  if(cust||loc) out.push([cust,loc].filter(Boolean).join(" - "), "");
+  if(cust||loc) out.push([cust,loc].filter(Boolean).join(" - "),"");
 
   [...daysDiv.children].forEach(day=>{
-    const date=day.querySelector("input[type=date]").value;
-    out.push(fmtDate(date));
-
-    [...day.querySelectorAll(".crews>.card")].forEach(c=>{
+    out.push(fmtDate(day.querySelector("input[type=date]").value));
+    [...day.querySelectorAll(".crew")].forEach(c=>{
       const size=c.querySelector("select").selectedOptions[0].text;
       const names=[...c.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean);
-      out.push(size, names.join(", "));
-
+      out.push(size,names.join(", "));
       const [st,et]=c.querySelectorAll("input[type=time]");
       out.push(`Start Time: ${fmtTime(st.value)}        Stop Time: ${fmtTime(et.value)}`);
-
       const wp=c.querySelector("textarea").value.trim();
-      if(wp) out.push("", wp);
+      if(wp) out.push("",wp);
 
       [...c.querySelectorAll(".rentals .item-row")].forEach(r=>{
         const parts=[...r.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
         if(parts.length) out.push(parts.join(" - "));
       });
-
       [...c.querySelectorAll(".materials .item-row")].forEach(m=>{
         const parts=[...m.querySelectorAll("input")].map(i=>i.value).filter(Boolean);
         if(parts.length) out.push(parts.join(" - "));
       });
-
       out.push("");
     });
   });
