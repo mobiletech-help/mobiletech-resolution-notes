@@ -6,7 +6,6 @@
 <title>MobileTech Resolution Notes</title>
 
 <style>
-/* === Base layout === */
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background: #f8fafc;
@@ -63,38 +62,32 @@ label {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-@media (max-width:600px) {
+@media(max-width:600px) {
   .row { grid-template-columns: 1fr; }
 }
 
-/* === INPUT HIGHLIGHTING === */
-input,
-textarea,
-select {
+/* Highlighted inputs */
+input, textarea, select {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
   border: 2px solid #d1d5db;
   font-size: 14px;
   background-color: #ffffff;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
 }
-
-input:focus,
-textarea:focus,
-select:focus {
+input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #0f62fe;
-  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.25);
+  box-shadow: 0 0 0 3px rgba(15,98,254,.25);
   background-color: #f0f7ff;
 }
-
 input:not(:placeholder-shown),
 textarea:not(:placeholder-shown) {
   background-color: #f9fafb;
 }
 
-/* === Crew collapse (CSS-only) === */
+/* Collapse */
 details.crew {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -106,32 +99,29 @@ details.crew summary {
   cursor: pointer;
   list-style: none;
 }
-details.crew summary::-webkit-details-marker {
-  display: none;
-}
+details.crew summary::-webkit-details-marker { display:none; }
 details.crew summary::before {
-  content: "▶";
-  display: inline-block;
-  margin-right: 6px;
-  transition: transform 0.2s ease;
+  content:"▶";
+  display:inline-block;
+  margin-right:6px;
+  transition: transform .2s;
 }
 details[open].crew summary::before {
   transform: rotate(90deg);
 }
 
 .crew-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  gap: 8px;
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+  gap:8px;
 }
 .item-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap: 8px;
-  margin-top: 6px;
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+  gap:8px;
+  margin-top:6px;
 }
 
-/* === Bottom bar === */
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -155,21 +145,23 @@ details[open].crew summary::before {
   <button id="helpBtn">Help</button>
 </div>
 
-<!-- Job context -->
+<datalist id="crewNames"></datalist>
+<datalist id="customerList"></datalist>
+<datalist id="locationList"></datalist>
+
 <div class="card">
   <label>Customer</label>
-  <input id="customer" placeholder="Customer">
+  <input id="customer" list="customerList" placeholder="Customer">
   <div class="hint">(Optional)</div>
 
   <label>Lease / Location</label>
-  <input id="location" placeholder="Lease or Location">
+  <input id="location" list="locationList" placeholder="Lease or Location">
   <div class="hint">(Optional)</div>
 </div>
 
 <div id="days"></div>
 </div>
 
-<!-- Bottom actions -->
 <div class="bottom-bar">
   <button id="clearAll">Clear All</button>
   <button class="primary" id="nextDay">Next Day</button>
@@ -179,43 +171,69 @@ details[open].crew summary::before {
 <script>
 const daysDiv = document.getElementById("days");
 
-function today() {
-  return new Date().toISOString().split("T")[0];
+/* ---------- Smartfill memory ---------- */
+function loadList(key, listId) {
+  const list = document.getElementById(listId);
+  list.innerHTML = "";
+  (JSON.parse(localStorage.getItem(key)) || []).forEach(v => {
+    const o = document.createElement("option");
+    o.value = v;
+    list.appendChild(o);
+  });
 }
+function saveToList(key, value, listId) {
+  if (!value) return;
+  const arr = JSON.parse(localStorage.getItem(key)) || [];
+  if (!arr.includes(value)) {
+    arr.push(value);
+    localStorage.setItem(key, JSON.stringify(arr));
+    loadList(key, listId);
+  }
+}
+loadList("crewNames","crewNames");
+loadList("customers","customerList");
+loadList("locations","locationList");
 
+document.getElementById("customer").addEventListener("blur",e=>{
+  saveToList("customers",e.target.value,"customerList");
+});
+document.getElementById("location").addEventListener("blur",e=>{
+  saveToList("locations",e.target.value,"locationList");
+});
+
+/* ---------- Crew logic ---------- */
 function updateCrewMembers(selectEl) {
   const crew = selectEl.closest("details.crew");
-  const container = crew.querySelector(".crew-grid");
-  const count = parseInt(selectEl.value, 10);
-
-  const existing = Array.from(container.querySelectorAll("input"))
-    .map(i => i.value);
-
-  container.innerHTML = "";
-
-  for (let i = 0; i < count; i++) {
-    const input = document.createElement("input");
-    input.placeholder = `Crew Member ${i + 1}`;
-    input.value = existing[i] || "";
-    container.appendChild(input);
+  const grid = crew.querySelector(".crew-grid");
+  const count = parseInt(selectEl.value,10);
+  const existing = [...grid.querySelectorAll("input")].map(i=>i.value);
+  grid.innerHTML="";
+  for(let i=0;i<count;i++){
+    const inp=document.createElement("input");
+    inp.placeholder=`Crew Member ${i+1}`;
+    inp.setAttribute("list","crewNames");
+    inp.value=existing[i]||"";
+    inp.addEventListener("blur",e=>{
+      saveToList("crewNames",e.target.value,"crewNames");
+    });
+    grid.appendChild(inp);
   }
 }
 
-function createCrew(num) {
-  const d = document.createElement("details");
-  d.className = "crew";
-  d.open = true;
-
-  d.innerHTML = `
+function createCrew(num){
+  const d=document.createElement("details");
+  d.className="crew";
+  d.open=true;
+  d.innerHTML=`
     <summary>Crew #${num}</summary>
 
     <label>Crew size</label>
     <select>
-      <option value="1">1-Man Crew</option>
-      <option value="2">2-Man Crew</option>
-      <option value="3">3-Man Crew</option>
-      <option value="4">4-Man Crew</option>
-      <option value="5">5-Man Crew</option>
+      <option value="1">1‑Man Crew</option>
+      <option value="2">2‑Man Crew</option>
+      <option value="3">3‑Man Crew</option>
+      <option value="4">4‑Man Crew</option>
+      <option value="5">5‑Man Crew</option>
     </select>
 
     <label>Crew members</label>
@@ -232,7 +250,7 @@ function createCrew(num) {
 
     <label>Rental (if applicable)</label>
     <div class="item-row">
-      <input placeholder="Item / Unit">
+      <input placeholder="Item">
       <input placeholder="Details">
       <input placeholder="Vendor">
       <input placeholder="PO">
@@ -245,65 +263,73 @@ function createCrew(num) {
       <input placeholder="Vendor">
       <input placeholder="PO">
     </div>
+
+    <button class="remove">Delete Crew</button>
   `;
-
-  const select = d.querySelector("select");
+  const select=d.querySelector("select");
   updateCrewMembers(select);
-  select.addEventListener("change", () => updateCrewMembers(select));
-
+  select.addEventListener("change",()=>updateCrewMembers(select));
+  d.querySelector(".remove").addEventListener("click",()=>{
+    d.remove();
+    renumberCrews(d.parentElement);
+  });
   return d;
 }
 
-function addDay(date) {
-  const card = document.createElement("div");
-  card.className = "card";
-
-  const crews = document.createElement("div");
-
-  const addCrewBtn = document.createElement("button");
-  addCrewBtn.textContent = "Add Crew";
-  addCrewBtn.addEventListener("click", () => {
-    crews.appendChild(createCrew(crews.children.length + 1));
+function renumberCrews(container){
+  [...container.querySelectorAll("details.crew")].forEach((c,i)=>{
+    c.querySelector("summary").textContent=`Crew #${i+1}`;
   });
+}
 
-  card.innerHTML = `
-    <label>Date</label>
-    <input type="date" value="${date}">
-  `;
+/* ---------- Day logic ---------- */
+function today(){ return new Date().toISOString().split("T")[0]; }
 
+function addDay(date){
+  const card=document.createElement("div");
+  card.className="card";
+  const crews=document.createElement("div");
+  const addCrewBtn=document.createElement("button");
+  addCrewBtn.textContent="Add Crew";
+  addCrewBtn.addEventListener("click",()=>{
+    crews.appendChild(createCrew(crews.children.length+1));
+  });
+  card.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
   crews.appendChild(createCrew(1));
   card.appendChild(crews);
   card.appendChild(addCrewBtn);
   daysDiv.appendChild(card);
 }
 
-document.getElementById("nextDay").addEventListener("click", () => {
-  const lastDate = daysDiv.lastElementChild.querySelector("input[type=date]").value;
-  const d = new Date(lastDate + "T00:00");
-  d.setDate(d.getDate() + 1);
+document.getElementById("nextDay").addEventListener("click",()=>{
+  const last=daysDiv.lastElementChild.querySelector("input[type=date]").value;
+  const d=new Date(last+"T00:00");
+  d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
 });
 
-document.getElementById("clearAll").addEventListener("click", () => {
-  if (confirm("Clear all entries?")) {
-    daysDiv.innerHTML = "";
+document.getElementById("clearAll").addEventListener("click",()=>{
+  if(confirm("Clear all entries?")){
+    daysDiv.innerHTML="";
     addDay(today());
   }
 });
 
-document.getElementById("copyAll").addEventListener("click", () => {
-  alert("Copy All formatting can be finalized next.");
-});
+/* ---------- Copy All ---------- */
+function fmtDate(d){
+  const dt=new Date(d+"T00:00");
+  return `${String(dt.getMonth()+1).padStart(2,"0")}/${String(dt.getDate()).padStart(2,"0")}/${String(dt.getFullYear()).slice(-2)}`;
+}
 
-document.getElementById("helpBtn").addEventListener("click", () => {
-  alert(
-    "Customer and Lease apply to all days. Each day starts with Crew #1. Crews can be collapsed. Rentals and materials are optional."
-  );
-});
+document.getElementById("copyAll").addEventListener("click",()=>{
+  let out=[];
+  if(customer.value||location.value)
+    out.push([customer.value,location.value].filter(Boolean).join(" – "), "");
 
-document.addEventListener("DOMContentLoaded", () => {
-  addDay(today());
-});
-</script>
-</body>
-</html>
+  [...daysDiv.children].forEach(day=>{
+    out.push(fmtDate(day.querySelector("input").value));
+    [...day.querySelectorAll("details.crew")].forEach(cr=>{
+      out.push(cr.querySelector("summary").textContent);
+      out.push([...cr.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean).join(", "));
+      const t=cr.querySelectorAll("input[type=time]");
+     
