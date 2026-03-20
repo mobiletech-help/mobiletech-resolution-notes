@@ -8,103 +8,131 @@
 <style>
 body {
   font-family: system-ui, Arial, sans-serif;
-  background:#f8fafc;
-  margin:0;
+  background: #f8fafc;
+  margin: 0;
 }
 .wrapper {
-  max-width:900px;
-  margin:auto;
-  padding:16px;
-  padding-bottom:180px;
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+  padding-bottom: 190px;
 }
 .top-bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
-h1 { margin:0; font-size:20px; }
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
 button {
-  padding:8px 12px;
-  border-radius:6px;
-  border:1px solid #d1d5db;
-  background:#fff;
-  cursor:pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
 }
 .primary {
-  background:#0f62fe;
-  color:#fff;
+  background: #0f62fe;
+  color: #fff;
 }
 .card {
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-  padding:12px;
-  margin-bottom:16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
 }
 label {
-  font-size:12px;
-  font-weight:600;
-  margin-top:8px;
-  display:block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  display: block;
 }
 .hint {
-  font-size:12px;
-  color:#6b7280;
+  font-size: 12px;
+  color: #6b7280;
 }
 .row {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
-@media(max-width:600px){ .row{grid-template-columns:1fr;} }
+@media(max-width:600px) {
+  .row { grid-template-columns: 1fr; }
+}
 
 /* Inputs */
 input, textarea, select {
-  width:100%;
-  padding:10px;
-  border-radius:6px;
-  border:2px solid #d1d5db;
-  transition:.15s;
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 2px solid #d1d5db;
+  transition: .15s;
 }
 input:focus, textarea:focus, select:focus {
-  outline:none;
-  border-color:#0f62fe;
-  box-shadow:0 0 0 3px rgba(15,98,254,.25);
+  outline: none;
+  border-color: #0f62fe;
+  box-shadow: 0 0 0 3px rgba(15,98,254,.25);
 }
 
 /* Collapse */
 details.crew {
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-  padding:8px;
-  margin-top:12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 12px;
 }
 details summary {
-  font-weight:700;
-  cursor:pointer;
-  list-style:none;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
 }
-summary::-webkit-details-marker { display:none; }
-summary::before { content:"▶"; margin-right:6px; }
-details[open] summary::before { transform:rotate(90deg); }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▶"; margin-right: 6px; }
+details[open] summary::before { transform: rotate(90deg); }
 
-.crew-grid,
+.crew-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+  gap: 8px;
+}
+
+.truck-row {
+  display: grid;
+  grid-template-columns: 1fr 36px;
+  gap: 6px;
+  align-items: center;
+}
+
 .item-row {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.remove-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .bottom-bar {
-  position:fixed;
-  bottom:0; left:0; right:0;
-  background:#fff;
-  border-top:1px solid #e5e7eb;
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  padding:10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
 }
 </style>
 </head>
@@ -117,19 +145,16 @@ details[open] summary::before { transform:rotate(90deg); }
   <button id="helpBtn">Help</button>
 </div>
 
-<!-- ✅ REQUIRED DATALISTS (THE FIX) -->
 <datalist id="crewNames"></datalist>
 <datalist id="truckList"></datalist>
-<datalist id="customerList"></datalist>
-<datalist id="locationList"></datalist>
 
 <div class="card">
   <label>Customer</label>
-  <input id="customer" list="customerList">
+  <input id="customer">
   <div class="hint">(Optional)</div>
 
   <label>Lease / Location</label>
-  <input id="location" list="locationList">
+  <input id="location">
   <div class="hint">(Optional)</div>
 </div>
 
@@ -143,86 +168,73 @@ details[open] summary::before { transform:rotate(90deg); }
 </div>
 
 <script>
-const daysDiv=document.getElementById("days");
+const daysDiv = document.getElementById("days");
 
 /* ===== Helpers ===== */
-function today(){ return new Date().toISOString().split("T")[0]; }
-function fmtDate(v){
-  const d=new Date(v+"T00:00");
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+function fmtDate(v) {
+  const d = new Date(v + "T00:00");
   return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
 }
 
-/* ===== Smartfill ===== */
-function load(key,id){
-  const dl=document.getElementById(id);
-  dl.innerHTML="";
-  (JSON.parse(localStorage.getItem(key))||[]).forEach(v=>{
-    const o=document.createElement("option");
-    o.value=v; dl.appendChild(o);
-  });
-}
-function save(key,v,id){
-  if(!v) return;
-  const arr=JSON.parse(localStorage.getItem(key))||[];
-  if(!arr.includes(v)){
-    arr.push(v);
-    localStorage.setItem(key,JSON.stringify(arr));
-    load(key,id);
-  }
-}
-load("crewNames","crewNames");
-load("truckList","truckList");
-load("customerList","customerList");
-load("locationList","locationList");
-
-customer.onblur=e=>save("customerList",e.target.value,"customerList");
-location.onblur=e=>save("locationList",e.target.value,"locationList");
-
-/* ===== Truck rules ===== */
-function sanitizeTruck(inp){
+/* ===== Truck Validation ===== */
+function sanitizeTruck(inp) {
   inp.value = inp.value.replace(/\D/g,"").slice(0,4);
 }
-function validateTruck(inp){
-  if(inp.value.length!==4){
-    if(inp.value!=="") alert("Truck # must be exactly 4 digits.");
-    inp.value="";
-  } else {
-    save("truckList",inp.value,"truckList");
-    checkDuplicateTruck(inp);
-  }
-}
-function checkDuplicateTruck(inp){
-  const day=inp.closest(".card");
-  const vals=[...day.querySelectorAll(".trucks input")]
-    .map(i=>i.value)
-    .filter(v=>v.length===4);
-  if(vals.filter(v=>v===inp.value).length>1){
-    alert(`Truck # ${inp.value} is already used on this day.`);
+function validateTruck(inp) {
+  if (inp.value.length !== 4) {
+    if (inp.value) alert("Truck # must be exactly 4 digits.");
+    inp.value = "";
   }
 }
 
 /* ===== Crew ===== */
-function updateCrewMembers(sel){
-  const grid=sel.closest("details").querySelector(".crew-grid");
-  const count=+sel.value;
-  grid.innerHTML="";
-  for(let i=0;i<count;i++){
-    const inp=document.createElement("input");
-    inp.placeholder=`Crew Member ${i+1}`;
+function updateCrewMembers(sel) {
+  const grid = sel.closest("details").querySelector(".crew-grid");
+  const count = +sel.value;
+  grid.innerHTML = "";
+  for (let i=0; i<count; i++) {
+    const inp = document.createElement("input");
+    inp.placeholder = `Crew Member ${i+1}`;
     inp.setAttribute("list","crewNames");
-    inp.onblur=e=>save("crewNames",e.target.value,"crewNames");
     grid.appendChild(inp);
   }
 }
 
-function createCrew(num){
-  const d=document.createElement("details");
-  d.className="crew"; d.open=true;
-  d.innerHTML=`
+function addTruckRow(trucks) {
+  const row = document.createElement("div");
+  row.className = "truck-row";
+
+  const inp = document.createElement("input");
+  inp.inputMode = "numeric";
+  inp.maxLength = 4;
+  inp.placeholder = "0000";
+  inp.setAttribute("list","truckList");
+  inp.oninput = ()=>sanitizeTruck(inp);
+  inp.onblur = ()=>validateTruck(inp);
+
+  const del = document.createElement("button");
+  del.textContent = "✕";
+  del.className = "remove-btn";
+  del.onclick = ()=>row.remove();
+
+  row.appendChild(inp);
+  row.appendChild(del);
+  trucks.appendChild(row);
+}
+
+function createCrew(num) {
+  const d = document.createElement("details");
+  d.className = "crew";
+  d.open = true;
+
+  d.innerHTML = `
     <summary>Crew #${num}</summary>
 
     <label>Trucks (4 digits)</label>
-    <div class="item-row trucks"></div>
+    <div class="trucks"></div>
     <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
@@ -237,86 +249,102 @@ function createCrew(num){
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
+    <label>Start / Stop</label>
+    <div class="row">
+      <input type="time">
+      <input type="time">
+    </div>
+
+    <label>Work performed</label>
+    <textarea></textarea>
+
+    <label>Rental (if applicable)</label>
+    <div class="item-row">
+      <input placeholder="Item">
+      <input placeholder="Details">
+    </div>
+
+    <label>Material (if applicable)</label>
+    <div class="item-row">
+      <input placeholder="Item">
+      <input placeholder="Details">
+    </div>
+
     <button class="remove">Delete Crew</button>
   `;
 
-  const trucks=d.querySelector(".trucks");
-  const addBtn=d.querySelector(".addTruck");
-
-  function addTruck(){
-    const inp=document.createElement("input");
-    inp.inputMode="numeric";
-    inp.maxLength=4;
-    inp.placeholder="0000";
-    inp.setAttribute("list","truckList");
-    inp.oninput=()=>sanitizeTruck(inp);
-    inp.onblur=()=>validateTruck(inp);
-    trucks.appendChild(inp);
-  }
-  addBtn.onclick=addTruck;
-  addTruck();
-
-  const sel=d.querySelector("select");
-  sel.onchange=()=>updateCrewMembers(sel);
+  const sel = d.querySelector("select");
   updateCrewMembers(sel);
+  sel.onchange = ()=>updateCrewMembers(sel);
 
-  d.querySelector(".remove").onclick=()=>{
-    const parent=d.parentElement;
+  const trucks = d.querySelector(".trucks");
+  const addTruck = d.querySelector(".addTruck");
+  addTruck.onclick = ()=>addTruckRow(trucks);
+  addTruckRow(trucks);
+
+  d.querySelector(".remove").onclick = ()=>{
+    const wrap = d.parentElement;
     d.remove();
-    [...parent.querySelectorAll("details")].forEach((c,i)=>{
-      c.querySelector("summary").innerText=`Crew #${i+1}`;
+    [...wrap.querySelectorAll("details")].forEach((c,i)=>{
+      c.querySelector("summary").textContent = `Crew #${i+1}`;
     });
   };
+
   return d;
 }
 
 /* ===== Day ===== */
-function addDay(date){
-  const card=document.createElement("div");
-  card.className="card";
-  const crews=document.createElement("div");
-  const btn=document.createElement("button");
-  btn.textContent="Add Crew";
-  btn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
-  card.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
+function addDay(date) {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const crews = document.createElement("div");
+  const addCrewBtn = document.createElement("button");
+  addCrewBtn.textContent = "Add Crew";
+  addCrewBtn.onclick = ()=>crews.appendChild(createCrew(crews.children.length+1));
+
+  card.innerHTML = `<label>Date</label><input type="date" value="${date}">`;
+
   crews.appendChild(createCrew(1));
   card.appendChild(crews);
-  card.appendChild(btn);
+  card.appendChild(addCrewBtn);
   daysDiv.appendChild(card);
 }
 
-nextDay.onclick=()=>{
-  const last=daysDiv.lastElementChild.querySelector("input").value;
-  const d=new Date(last+"T00:00");
+nextDay.onclick = ()=>{
+  const last = daysDiv.lastElementChild.querySelector("input").value;
+  const d = new Date(last + "T00:00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
 };
 
-clearAll.onclick=()=>{
-  if(confirm("Clear all entries?")){
-    daysDiv.innerHTML="";
+clearAll.onclick = ()=>{
+  if (confirm("Clear all entries?")) {
+    daysDiv.innerHTML = "";
     addDay(today());
   }
 };
 
-copyAll.onclick=()=>{
-  let out=[];
-  if(customer.value||location.value)
-    out.push([customer.value,location.value].filter(Boolean).join(" – "), "");
+copyAll.onclick = ()=>{
+  let out = [];
   [...daysDiv.children].forEach(day=>{
-    out.push(fmtDate(day.querySelector("input[type=date]").value));
+    out.push(fmtDate(day.querySelector("input").value));
     [...day.querySelectorAll("details")].forEach(cr=>{
-      out.push(cr.querySelector("summary").innerText);
-      const trucks=[...cr.querySelectorAll(".trucks input")].map(i=>i.value).filter(v=>v.length===4);
-      if(trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
+      out.push(cr.querySelector("summary").textContent);
+      const trucks = [...cr.querySelectorAll(".truck-row input")]
+        .map(i=>i.value).filter(v=>v.length===4);
+      if (trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
+      out.push(cr.querySelector("textarea").value || "");
+      out.push("");
     });
-    out.push("");
   });
   navigator.clipboard.writeText(out.join("\n"));
   alert("Copied.");
 };
 
-helpBtn.onclick=()=>alert("Truck numbers must be exactly 4 digits. Duplicate trucks on the same day will warn you.");
+helpBtn.onclick = ()=>alert(
+  "Use Add Truck to include multiple trucks. Each truck must be exactly 4 digits. You can remove any truck individually."
+);
 
 document.addEventListener("DOMContentLoaded",()=>addDay(today()));
 </script>
