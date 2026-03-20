@@ -332,4 +332,20 @@ document.getElementById("copyAll").addEventListener("click",()=>{
       out.push(cr.querySelector("summary").textContent);
       out.push([...cr.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean).join(", "));
       const t=cr.querySelectorAll("input[type=time]");
-     
+      out.push(`Start: ${t[0].value}   Stop: ${t[1].value}`);
+      out.push(cr.querySelector("textarea").value || "");
+      out.push("");
+    });
+  });
+  navigator.clipboard.writeText(out.join("\n"));
+  alert("Copied to clipboard.");
+});
+
+document.getElementById("helpBtn").addEventListener("click",()=>{
+  alert("Customer/Lease apply to all days. Each day starts with Crew #1. Crews can be collapsed. Rentals and materials are optional.");
+});
+
+document.addEventListener("DOMContentLoaded",()=>addDay(today()));
+</script>
+</body>
+</html>
