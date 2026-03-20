@@ -8,131 +8,116 @@
 <style>
 body {
   font-family: system-ui, Arial, sans-serif;
-  background: #f8fafc;
-  margin: 0;
+  background:#f8fafc;
+  margin:0;
 }
 .wrapper {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
-  padding-bottom: 190px;
+  max-width:900px;
+  margin:auto;
+  padding:16px;
+  padding-bottom:190px;
 }
 .top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
 }
-h1 {
-  margin: 0;
-  font-size: 20px;
-}
+h1 { margin:0; font-size:20px; }
+
 button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  cursor: pointer;
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+  background:#fff;
+  cursor:pointer;
 }
 .primary {
-  background: #0f62fe;
-  color: #fff;
-}
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 8px;
-  display: block;
-}
-.hint {
-  font-size: 12px;
-  color: #6b7280;
-}
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media(max-width:600px) {
-  .row { grid-template-columns: 1fr; }
+  background:#0f62fe;
+  color:#fff;
 }
 
-/* Inputs */
+.card {
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:16px;
+}
+
+label {
+  font-size:12px;
+  font-weight:600;
+  margin-top:10px;
+  display:block;
+}
+
+.row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media(max-width:600px){ .row{grid-template-columns:1fr;} }
+
 input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 2px solid #d1d5db;
-  transition: .15s;
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:2px solid #d1d5db;
 }
 input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #0f62fe;
-  box-shadow: 0 0 0 3px rgba(15,98,254,.25);
+  outline:none;
+  border-color:#0f62fe;
+  box-shadow:0 0 0 3px rgba(15,98,254,.25);
 }
 
-/* Collapse */
+/* Crew collapse */
 details.crew {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px;
-  margin-top: 12px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:8px;
+  margin-top:12px;
 }
 details summary {
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
+  font-weight:700;
+  cursor:pointer;
+  list-style:none;
 }
-summary::-webkit-details-marker { display: none; }
-summary::before { content: "▶"; margin-right: 6px; }
-details[open] summary::before { transform: rotate(90deg); }
+summary::-webkit-details-marker { display:none; }
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); }
 
 .crew-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-  gap: 8px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:8px;
 }
 
-.truck-row {
-  display: grid;
-  grid-template-columns: 1fr 36px;
-  gap: 6px;
-  align-items: center;
+/* Rental / Material rows */
+.line-row {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 40px;
+  gap:6px;
+  align-items:center;
+  margin-top:6px;
 }
-
-.item-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-  gap: 8px;
-  margin-top: 6px;
-}
-
 .remove-btn {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  background:#ef4444;
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
 }
 
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
+  position:fixed;
+  bottom:0; left:0; right:0;
+  background:#fff;
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
 }
 </style>
 </head>
@@ -142,100 +127,62 @@ details[open] summary::before { transform: rotate(90deg); }
 
 <div class="top-bar">
   <h1>MobileTech Resolution Notes</h1>
-  <button id="helpBtn">Help</button>
+  <button onclick="alert('Use Add buttons to add crews, trucks, rentals, and materials. Each truck must be 4 digits.')">Help</button>
 </div>
-
-<datalist id="crewNames"></datalist>
-<datalist id="truckList"></datalist>
 
 <div class="card">
   <label>Customer</label>
-  <input id="customer">
-  <div class="hint">(Optional)</div>
+  <input>
 
   <label>Lease / Location</label>
-  <input id="location">
-  <div class="hint">(Optional)</div>
+  <input>
 </div>
 
 <div id="days"></div>
 </div>
 
 <div class="bottom-bar">
-  <button id="clearAll">Clear All</button>
-  <button id="nextDay" class="primary">Next Day</button>
-  <button id="copyAll">Copy All</button>
+  <button onclick="clearAll()">Clear All</button>
+  <button class="primary" onclick="nextDay()">Next Day</button>
+  <button onclick="copyAll()">Copy All</button>
 </div>
 
 <script>
 const daysDiv = document.getElementById("days");
 
-/* ===== Helpers ===== */
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-function fmtDate(v) {
-  const d = new Date(v + "T00:00");
-  return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
+function today(){ return new Date().toISOString().split("T")[0]; }
+
+function addLine(container){
+  const row=document.createElement("div");
+  row.className="line-row";
+  row.innerHTML=`
+    <input placeholder="Item / Unit">
+    <input placeholder="Details">
+    <input placeholder="Qty / Miles">
+    <input placeholder="Vendor">
+    <input placeholder="PO">
+    <button class="remove-btn">✕</button>
+  `;
+  row.querySelector("button").onclick=()=>row.remove();
+  container.appendChild(row);
 }
 
-/* ===== Truck Validation ===== */
-function sanitizeTruck(inp) {
-  inp.value = inp.value.replace(/\D/g,"").slice(0,4);
-}
-function validateTruck(inp) {
-  if (inp.value.length !== 4) {
-    if (inp.value) alert("Truck # must be exactly 4 digits.");
-    inp.value = "";
-  }
-}
-
-/* ===== Crew ===== */
-function updateCrewMembers(sel) {
-  const grid = sel.closest("details").querySelector(".crew-grid");
-  const count = +sel.value;
-  grid.innerHTML = "";
-  for (let i=0; i<count; i++) {
-    const inp = document.createElement("input");
-    inp.placeholder = `Crew Member ${i+1}`;
-    inp.setAttribute("list","crewNames");
+function updateCrewMembers(sel){
+  const grid=sel.closest("details").querySelector(".crew-grid");
+  const cnt=+sel.value;
+  grid.innerHTML="";
+  for(let i=0;i<cnt;i++){
+    const inp=document.createElement("input");
+    inp.placeholder=`Crew Member ${i+1}`;
     grid.appendChild(inp);
   }
 }
 
-function addTruckRow(trucks) {
-  const row = document.createElement("div");
-  row.className = "truck-row";
-
-  const inp = document.createElement("input");
-  inp.inputMode = "numeric";
-  inp.maxLength = 4;
-  inp.placeholder = "0000";
-  inp.setAttribute("list","truckList");
-  inp.oninput = ()=>sanitizeTruck(inp);
-  inp.onblur = ()=>validateTruck(inp);
-
-  const del = document.createElement("button");
-  del.textContent = "✕";
-  del.className = "remove-btn";
-  del.onclick = ()=>row.remove();
-
-  row.appendChild(inp);
-  row.appendChild(del);
-  trucks.appendChild(row);
-}
-
-function createCrew(num) {
-  const d = document.createElement("details");
-  d.className = "crew";
-  d.open = true;
-
-  d.innerHTML = `
+function createCrew(num){
+  const d=document.createElement("details");
+  d.open=true; d.className="crew";
+  d.innerHTML=`
     <summary>Crew #${num}</summary>
-
-    <label>Trucks (4 digits)</label>
-    <div class="trucks"></div>
-    <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
     <select>
@@ -259,92 +206,60 @@ function createCrew(num) {
     <textarea></textarea>
 
     <label>Rental (if applicable)</label>
-    <div class="item-row">
-      <input placeholder="Item">
-      <input placeholder="Details">
-    </div>
+    <div class="rentals"></div>
+    <button>Add Rental</button>
 
     <label>Material (if applicable)</label>
-    <div class="item-row">
-      <input placeholder="Item">
-      <input placeholder="Details">
-    </div>
+    <div class="materials"></div>
+    <button>Add Material</button>
 
-    <button class="remove">Delete Crew</button>
+    <button onclick="this.closest('details').remove()">Delete Crew</button>
   `;
 
-  const sel = d.querySelector("select");
+  const sel=d.querySelector("select");
+  sel.onchange=()=>updateCrewMembers(sel);
   updateCrewMembers(sel);
-  sel.onchange = ()=>updateCrewMembers(sel);
 
-  const trucks = d.querySelector(".trucks");
-  const addTruck = d.querySelector(".addTruck");
-  addTruck.onclick = ()=>addTruckRow(trucks);
-  addTruckRow(trucks);
+  const rentals=d.querySelector(".rentals");
+  const materials=d.querySelector(".materials");
 
-  d.querySelector(".remove").onclick = ()=>{
-    const wrap = d.parentElement;
-    d.remove();
-    [...wrap.querySelectorAll("details")].forEach((c,i)=>{
-      c.querySelector("summary").textContent = `Crew #${i+1}`;
-    });
-  };
+  d.querySelectorAll("button")[0].onclick=()=>addLine(rentals);
+  d.querySelectorAll("button")[1].onclick=()=>addLine(materials);
 
   return d;
 }
 
-/* ===== Day ===== */
-function addDay(date) {
-  const card = document.createElement("div");
-  card.className = "card";
-
-  const crews = document.createElement("div");
-  const addCrewBtn = document.createElement("button");
-  addCrewBtn.textContent = "Add Crew";
-  addCrewBtn.onclick = ()=>crews.appendChild(createCrew(crews.children.length+1));
-
-  card.innerHTML = `<label>Date</label><input type="date" value="${date}">`;
-
+function addDay(date){
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
+  const crews=document.createElement("div");
+  const btn=document.createElement("button");
+  btn.textContent="Add Crew";
+  btn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
   crews.appendChild(createCrew(1));
   card.appendChild(crews);
-  card.appendChild(addCrewBtn);
+  card.appendChild(btn);
   daysDiv.appendChild(card);
 }
 
-nextDay.onclick = ()=>{
-  const last = daysDiv.lastElementChild.querySelector("input").value;
-  const d = new Date(last + "T00:00");
+function nextDay(){
+  const last=daysDiv.lastElementChild.querySelector("input").value;
+  const d=new Date(last+"T00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
-};
+}
 
-clearAll.onclick = ()=>{
-  if (confirm("Clear all entries?")) {
-    daysDiv.innerHTML = "";
+function clearAll(){
+  if(confirm("Clear all entries?")){
+    daysDiv.innerHTML="";
     addDay(today());
   }
-};
+}
 
-copyAll.onclick = ()=>{
-  let out = [];
-  [...daysDiv.children].forEach(day=>{
-    out.push(fmtDate(day.querySelector("input").value));
-    [...day.querySelectorAll("details")].forEach(cr=>{
-      out.push(cr.querySelector("summary").textContent);
-      const trucks = [...cr.querySelectorAll(".truck-row input")]
-        .map(i=>i.value).filter(v=>v.length===4);
-      if (trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
-      out.push(cr.querySelector("textarea").value || "");
-      out.push("");
-    });
-  });
-  navigator.clipboard.writeText(out.join("\n"));
-  alert("Copied.");
-};
-
-helpBtn.onclick = ()=>alert(
-  "Use Add Truck to include multiple trucks. Each truck must be exactly 4 digits. You can remove any truck individually."
-);
+function copyAll(){
+  alert("Copy formatting will include rentals/materials next.");
+}
 
 document.addEventListener("DOMContentLoaded",()=>addDay(today()));
 </script>
