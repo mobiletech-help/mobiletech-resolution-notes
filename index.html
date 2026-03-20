@@ -7,132 +7,104 @@
 
 <style>
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background: #f8fafc;
-  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background:#f8fafc;
+  margin:0;
 }
 .wrapper {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
-  padding-bottom: 180px;
+  max-width:900px;
+  margin:auto;
+  padding:16px;
+  padding-bottom:180px;
 }
 .top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
 }
-h1 {
-  font-size: 20px;
-  margin: 0;
-}
+h1 { margin:0; font-size:20px; }
 button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  cursor: pointer;
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+  background:#fff;
+  cursor:pointer;
 }
 .primary {
-  background: #0f62fe;
-  color: #fff;
-  border-color: #0f62fe;
+  background:#0f62fe;
+  color:#fff;
 }
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:16px;
 }
 label {
-  font-size: 12px;
-  font-weight: 600;
-  display: block;
-  margin-top: 8px;
+  font-size:12px;
+  font-weight:600;
+  margin-top:8px;
+  display:block;
 }
 .hint {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 4px;
+  font-size:12px;
+  color:#6b7280;
 }
 .row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
-@media(max-width:600px) {
-  .row { grid-template-columns: 1fr; }
-}
+@media(max-width:600px){ .row{grid-template-columns:1fr;} }
 
-/* Highlighted inputs */
+/* Inputs */
 input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 2px solid #d1d5db;
-  font-size: 14px;
-  background-color: #ffffff;
-  transition: border-color .15s, box-shadow .15s, background-color .15s;
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:2px solid #d1d5db;
+  transition:.15s;
 }
 input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #0f62fe;
-  box-shadow: 0 0 0 3px rgba(15,98,254,.25);
-  background-color: #f0f7ff;
-}
-input:not(:placeholder-shown),
-textarea:not(:placeholder-shown) {
-  background-color: #f9fafb;
+  outline:none;
+  border-color:#0f62fe;
+  box-shadow:0 0 0 3px rgba(15,98,254,.25);
 }
 
 /* Collapse */
 details.crew {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px;
-  margin-top: 12px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:8px;
+  margin-top:12px;
 }
-details.crew summary {
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
+details summary {
+  font-weight:700;
+  cursor:pointer;
+  list-style:none;
 }
-details.crew summary::-webkit-details-marker { display:none; }
-details.crew summary::before {
-  content:"▶";
-  display:inline-block;
-  margin-right:6px;
-  transition: transform .2s;
-}
-details[open].crew summary::before {
-  transform: rotate(90deg);
-}
+summary::-webkit-details-marker { display:none; }
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 
-.crew-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-  gap:8px;
-}
+.crew-grid,
 .item-row {
   display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
-  margin-top:6px;
 }
 
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
+  position:fixed;
+  bottom:0; left:0; right:0;
+  background:#fff;
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
 }
 </style>
 </head>
@@ -146,17 +118,13 @@ details[open].crew summary::before {
 </div>
 
 <datalist id="crewNames"></datalist>
-<datalist id="customerList"></datalist>
-<datalist id="locationList"></datalist>
+<datalist id="truckList"></datalist>
 
 <div class="card">
   <label>Customer</label>
-  <input id="customer" list="customerList" placeholder="Customer">
-  <div class="hint">(Optional)</div>
-
+  <input id="customer">
   <label>Lease / Location</label>
-  <input id="location" list="locationList" placeholder="Lease or Location">
-  <div class="hint">(Optional)</div>
+  <input id="location">
 </div>
 
 <div id="days"></div>
@@ -164,68 +132,88 @@ details[open].crew summary::before {
 
 <div class="bottom-bar">
   <button id="clearAll">Clear All</button>
-  <button class="primary" id="nextDay">Next Day</button>
+  <button id="nextDay" class="primary">Next Day</button>
   <button id="copyAll">Copy All</button>
 </div>
 
 <script>
-const daysDiv = document.getElementById("days");
+const daysDiv=document.getElementById("days");
 
-/* ---------- Smartfill memory ---------- */
-function loadList(key, listId) {
-  const list = document.getElementById(listId);
-  list.innerHTML = "";
-  (JSON.parse(localStorage.getItem(key)) || []).forEach(v => {
-    const o = document.createElement("option");
-    o.value = v;
-    list.appendChild(o);
+/* ===== Smartfill ===== */
+function load(key,id){
+  const dl=document.getElementById(id);
+  dl.innerHTML="";
+  (JSON.parse(localStorage.getItem(key))||[]).forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v; dl.appendChild(o);
   });
 }
-function saveToList(key, value, listId) {
-  if (!value) return;
-  const arr = JSON.parse(localStorage.getItem(key)) || [];
-  if (!arr.includes(value)) {
-    arr.push(value);
-    localStorage.setItem(key, JSON.stringify(arr));
-    loadList(key, listId);
+function save(key,v,id){
+  if(!v || v.length!==4) return;
+  const arr=JSON.parse(localStorage.getItem(key))||[];
+  if(!arr.includes(v)){
+    arr.push(v);
+    localStorage.setItem(key,JSON.stringify(arr));
+    load(key,id);
   }
 }
-loadList("crewNames","crewNames");
-loadList("customers","customerList");
-loadList("locations","locationList");
+load("crewNames","crewNames");
+load("truckList","truckList");
 
-document.getElementById("customer").addEventListener("blur",e=>{
-  saveToList("customers",e.target.value,"customerList");
-});
-document.getElementById("location").addEventListener("blur",e=>{
-  saveToList("locations",e.target.value,"locationList");
-});
+/* ===== Truck enforcement & duplicate check ===== */
+function sanitizeTruck(inp){
+  inp.value = inp.value.replace(/\D/g,"").slice(0,4);
+}
 
-/* ---------- Crew logic ---------- */
-function updateCrewMembers(selectEl) {
-  const crew = selectEl.closest("details.crew");
-  const grid = crew.querySelector(".crew-grid");
-  const count = parseInt(selectEl.value,10);
-  const existing = [...grid.querySelectorAll("input")].map(i=>i.value);
+function checkDuplicateTruck(inp){
+  if(inp.value.length!==4) return;
+
+  const dayCard = inp.closest(".card"); // date container
+  const trucks = [...dayCard.querySelectorAll(".trucks input")]
+    .map(i=>i.value)
+    .filter(v=>v.length===4);
+
+  const duplicates = trucks.filter(v=>v===inp.value);
+
+  if(duplicates.length > 1){
+    alert(`Truck # ${inp.value} is already used on this day.`);
+  }
+}
+
+function validateTruck(inp){
+  if(inp.value.length !== 4){
+    if(inp.value !== ""){
+      alert("Truck # must be exactly 4 digits.");
+    }
+    inp.value="";
+  } else {
+    save("truckList",inp.value,"truckList");
+    checkDuplicateTruck(inp);
+  }
+}
+
+/* ===== Crew ===== */
+function updateCrewMembers(sel){
+  const grid=sel.closest("details").querySelector(".crew-grid");
+  const cnt=+sel.value;
   grid.innerHTML="";
-  for(let i=0;i<count;i++){
+  for(let i=0;i<cnt;i++){
     const inp=document.createElement("input");
     inp.placeholder=`Crew Member ${i+1}`;
     inp.setAttribute("list","crewNames");
-    inp.value=existing[i]||"";
-    inp.addEventListener("blur",e=>{
-      saveToList("crewNames",e.target.value,"crewNames");
-    });
     grid.appendChild(inp);
   }
 }
 
 function createCrew(num){
   const d=document.createElement("details");
-  d.className="crew";
-  d.open=true;
+  d.className="crew"; d.open=true;
   d.innerHTML=`
     <summary>Crew #${num}</summary>
+
+    <label>Trucks (exactly 4 digits)</label>
+    <div class="item-row trucks"></div>
+    <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
     <select>
@@ -239,113 +227,88 @@ function createCrew(num){
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
-    <label>Start time / Stop time</label>
-    <div class="row">
-      <input type="time">
-      <input type="time">
-    </div>
-
-    <label>Work performed</label>
-    <textarea></textarea>
-
-    <label>Rental (if applicable)</label>
-    <div class="item-row">
-      <input placeholder="Item">
-      <input placeholder="Details">
-      <input placeholder="Vendor">
-      <input placeholder="PO">
-    </div>
-
-    <label>Material (if applicable)</label>
-    <div class="item-row">
-      <input placeholder="Item">
-      <input placeholder="Details">
-      <input placeholder="Vendor">
-      <input placeholder="PO">
-    </div>
-
     <button class="remove">Delete Crew</button>
   `;
-  const select=d.querySelector("select");
-  updateCrewMembers(select);
-  select.addEventListener("change",()=>updateCrewMembers(select));
-  d.querySelector(".remove").addEventListener("click",()=>{
+
+  const trucks=d.querySelector(".trucks");
+  const addBtn=d.querySelector(".addTruck");
+
+  function addTruck(){
+    const inp=document.createElement("input");
+    inp.inputMode="numeric";
+    inp.maxLength=4;
+    inp.placeholder="0000";
+    inp.setAttribute("list","truckList");
+    inp.oninput=()=>sanitizeTruck(inp);
+    inp.onblur=()=>validateTruck(inp);
+    trucks.appendChild(inp);
+  }
+  addBtn.onclick=addTruck;
+  addTruck();
+
+  const sel=d.querySelector("select");
+  sel.onchange=()=>updateCrewMembers(sel);
+  updateCrewMembers(sel);
+
+  d.querySelector(".remove").onclick=()=>{
+    const p=d.parentElement;
     d.remove();
-    renumberCrews(d.parentElement);
-  });
+    [...p.querySelectorAll("details")].forEach((c,i)=>{
+      c.querySelector("summary").innerText=`Crew #${i+1}`;
+    });
+  };
   return d;
 }
 
-function renumberCrews(container){
-  [...container.querySelectorAll("details.crew")].forEach((c,i)=>{
-    c.querySelector("summary").textContent=`Crew #${i+1}`;
-  });
-}
-
-/* ---------- Day logic ---------- */
+/* ===== Day ===== */
 function today(){ return new Date().toISOString().split("T")[0]; }
-
 function addDay(date){
   const card=document.createElement("div");
   card.className="card";
   const crews=document.createElement("div");
-  const addCrewBtn=document.createElement("button");
-  addCrewBtn.textContent="Add Crew";
-  addCrewBtn.addEventListener("click",()=>{
-    crews.appendChild(createCrew(crews.children.length+1));
-  });
+  const btn=document.createElement("button");
+  btn.innerText="Add Crew";
+  btn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
   card.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
   crews.appendChild(createCrew(1));
   card.appendChild(crews);
-  card.appendChild(addCrewBtn);
+  card.appendChild(btn);
   daysDiv.appendChild(card);
 }
 
-document.getElementById("nextDay").addEventListener("click",()=>{
-  const last=daysDiv.lastElementChild.querySelector("input[type=date]").value;
+nextDay.onclick=()=>{
+  const last=daysDiv.lastElementChild.querySelector("input").value;
   const d=new Date(last+"T00:00");
   d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
-});
+};
 
-document.getElementById("clearAll").addEventListener("click",()=>{
-  if(confirm("Clear all entries?")){
+clearAll.onclick=()=>{
+  if(confirm("Clear all?")){
     daysDiv.innerHTML="";
     addDay(today());
   }
-});
+};
 
-/* ---------- Copy All ---------- */
-function fmtDate(d){
-  const dt=new Date(d+"T00:00");
-  return `${String(dt.getMonth()+1).padStart(2,"0")}/${String(dt.getDate()).padStart(2,"0")}/${String(dt.getFullYear()).slice(-2)}`;
-}
-
-document.getElementById("copyAll").addEventListener("click",()=>{
+/* ===== Copy All ===== */
+copyAll.onclick=()=>{
   let out=[];
-  if(customer.value||location.value)
-    out.push([customer.value,location.value].filter(Boolean).join(" – "), "");
-
   [...daysDiv.children].forEach(day=>{
-    out.push(fmtDate(day.querySelector("input").value));
-    [...day.querySelectorAll("details.crew")].forEach(cr=>{
-      out.push(cr.querySelector("summary").textContent);
-      out.push([...cr.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(Boolean).join(", "));
-      const t=cr.querySelectorAll("input[type=time]");
-      out.push(`Start: ${t[0].value}   Stop: ${t[1].value}`);
-      out.push(cr.querySelector("textarea").value || "");
-      out.push("");
+    const d=new Date(day.querySelector("input").value+"T00:00");
+    out.push(`${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`);
+    [...day.querySelectorAll("details")].forEach(cr=>{
+      out.push(cr.querySelector("summary").innerText);
+      const trucks=[...cr.querySelectorAll(".trucks input")].map(i=>i.value).filter(v=>v.length===4);
+      if(trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
     });
+    out.push("");
   });
   navigator.clipboard.writeText(out.join("\n"));
-  alert("Copied to clipboard.");
-});
+  alert("Copied.");
+};
 
-document.getElementById("helpBtn").addEventListener("click",()=>{
-  alert("Customer/Lease apply to all days. Each day starts with Crew #1. Crews can be collapsed. Rentals and materials are optional.");
-});
+helpBtn.onclick=()=>alert(
+  "Truck numbers must be exactly 4 digits. You will be warned if a truck is entered more than once on the same day."
+);
 
-document.addEventListener("DOMContentLoaded",()=>addDay(today()));
-</script>
-</body>
-</html>
+document.addEventListener("DOMContent
