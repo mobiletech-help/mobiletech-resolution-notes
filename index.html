@@ -87,7 +87,7 @@ details summary {
 }
 summary::-webkit-details-marker { display:none; }
 summary::before { content:"▶"; margin-right:6px; }
-details[open] summary::before { transform:rotate(90deg); display:inline-block; }
+details[open] summary::before { transform:rotate(90deg); }
 
 .crew-grid,
 .item-row {
@@ -117,14 +117,20 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
   <button id="helpBtn">Help</button>
 </div>
 
+<!-- ✅ REQUIRED DATALISTS (THE FIX) -->
 <datalist id="crewNames"></datalist>
 <datalist id="truckList"></datalist>
+<datalist id="customerList"></datalist>
+<datalist id="locationList"></datalist>
 
 <div class="card">
   <label>Customer</label>
-  <input id="customer">
+  <input id="customer" list="customerList">
+  <div class="hint">(Optional)</div>
+
   <label>Lease / Location</label>
-  <input id="location">
+  <input id="location" list="locationList">
+  <div class="hint">(Optional)</div>
 </div>
 
 <div id="days"></div>
@@ -139,6 +145,13 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 <script>
 const daysDiv=document.getElementById("days");
 
+/* ===== Helpers ===== */
+function today(){ return new Date().toISOString().split("T")[0]; }
+function fmtDate(v){
+  const d=new Date(v+"T00:00");
+  return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
+}
+
 /* ===== Smartfill ===== */
 function load(key,id){
   const dl=document.getElementById(id);
@@ -149,7 +162,7 @@ function load(key,id){
   });
 }
 function save(key,v,id){
-  if(!v || v.length!==4) return;
+  if(!v) return;
   const arr=JSON.parse(localStorage.getItem(key))||[];
   if(!arr.includes(v)){
     arr.push(v);
@@ -159,48 +172,45 @@ function save(key,v,id){
 }
 load("crewNames","crewNames");
 load("truckList","truckList");
+load("customerList","customerList");
+load("locationList","locationList");
 
-/* ===== Truck enforcement & duplicate check ===== */
+customer.onblur=e=>save("customerList",e.target.value,"customerList");
+location.onblur=e=>save("locationList",e.target.value,"locationList");
+
+/* ===== Truck rules ===== */
 function sanitizeTruck(inp){
   inp.value = inp.value.replace(/\D/g,"").slice(0,4);
 }
-
-function checkDuplicateTruck(inp){
-  if(inp.value.length!==4) return;
-
-  const dayCard = inp.closest(".card"); // date container
-  const trucks = [...dayCard.querySelectorAll(".trucks input")]
-    .map(i=>i.value)
-    .filter(v=>v.length===4);
-
-  const duplicates = trucks.filter(v=>v===inp.value);
-
-  if(duplicates.length > 1){
-    alert(`Truck # ${inp.value} is already used on this day.`);
-  }
-}
-
 function validateTruck(inp){
-  if(inp.value.length !== 4){
-    if(inp.value !== ""){
-      alert("Truck # must be exactly 4 digits.");
-    }
+  if(inp.value.length!==4){
+    if(inp.value!=="") alert("Truck # must be exactly 4 digits.");
     inp.value="";
   } else {
     save("truckList",inp.value,"truckList");
     checkDuplicateTruck(inp);
   }
 }
+function checkDuplicateTruck(inp){
+  const day=inp.closest(".card");
+  const vals=[...day.querySelectorAll(".trucks input")]
+    .map(i=>i.value)
+    .filter(v=>v.length===4);
+  if(vals.filter(v=>v===inp.value).length>1){
+    alert(`Truck # ${inp.value} is already used on this day.`);
+  }
+}
 
 /* ===== Crew ===== */
 function updateCrewMembers(sel){
   const grid=sel.closest("details").querySelector(".crew-grid");
-  const cnt=+sel.value;
+  const count=+sel.value;
   grid.innerHTML="";
-  for(let i=0;i<cnt;i++){
+  for(let i=0;i<count;i++){
     const inp=document.createElement("input");
     inp.placeholder=`Crew Member ${i+1}`;
     inp.setAttribute("list","crewNames");
+    inp.onblur=e=>save("crewNames",e.target.value,"crewNames");
     grid.appendChild(inp);
   }
 }
@@ -211,7 +221,7 @@ function createCrew(num){
   d.innerHTML=`
     <summary>Crew #${num}</summary>
 
-    <label>Trucks (exactly 4 digits)</label>
+    <label>Trucks (4 digits)</label>
     <div class="item-row trucks"></div>
     <button class="addTruck">Add Truck</button>
 
@@ -251,9 +261,9 @@ function createCrew(num){
   updateCrewMembers(sel);
 
   d.querySelector(".remove").onclick=()=>{
-    const p=d.parentElement;
+    const parent=d.parentElement;
     d.remove();
-    [...p.querySelectorAll("details")].forEach((c,i)=>{
+    [...parent.querySelectorAll("details")].forEach((c,i)=>{
       c.querySelector("summary").innerText=`Crew #${i+1}`;
     });
   };
@@ -261,13 +271,12 @@ function createCrew(num){
 }
 
 /* ===== Day ===== */
-function today(){ return new Date().toISOString().split("T")[0]; }
 function addDay(date){
   const card=document.createElement("div");
   card.className="card";
   const crews=document.createElement("div");
   const btn=document.createElement("button");
-  btn.innerText="Add Crew";
+  btn.textContent="Add Crew";
   btn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
   card.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
   crews.appendChild(createCrew(1));
@@ -284,18 +293,18 @@ nextDay.onclick=()=>{
 };
 
 clearAll.onclick=()=>{
-  if(confirm("Clear all?")){
+  if(confirm("Clear all entries?")){
     daysDiv.innerHTML="";
     addDay(today());
   }
 };
 
-/* ===== Copy All ===== */
 copyAll.onclick=()=>{
   let out=[];
+  if(customer.value||location.value)
+    out.push([customer.value,location.value].filter(Boolean).join(" – "), "");
   [...daysDiv.children].forEach(day=>{
-    const d=new Date(day.querySelector("input").value+"T00:00");
-    out.push(`${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`);
+    out.push(fmtDate(day.querySelector("input[type=date]").value));
     [...day.querySelectorAll("details")].forEach(cr=>{
       out.push(cr.querySelector("summary").innerText);
       const trucks=[...cr.querySelectorAll(".trucks input")].map(i=>i.value).filter(v=>v.length===4);
@@ -307,8 +316,9 @@ copyAll.onclick=()=>{
   alert("Copied.");
 };
 
-helpBtn.onclick=()=>alert(
-  "Truck numbers must be exactly 4 digits. You will be warned if a truck is entered more than once on the same day."
-);
+helpBtn.onclick=()=>alert("Truck numbers must be exactly 4 digits. Duplicate trucks on the same day will warn you.");
 
-document.addEventListener("DOMContent
+document.addEventListener("DOMContentLoaded",()=>addDay(today()));
+</script>
+</body>
+</html>
