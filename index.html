@@ -179,20 +179,165 @@ details[open] summary::before{transform:rotate(90deg);display:inline-block;}
   <div class="help-panel">
     <div class="help-close" id="helpClose">Close ✕</div>
 
-    <h3>How to use this page</h3>
+    <h3>How to Use MobileTech Resolution Notes</h3>
 
-    <p><strong>Customer / Lease</strong> are optional and apply to all days.</p>
+    <p>
+      This tool helps you build clean, consistent resolution notes for
+      MobileTech. Nothing is saved. Use <strong>Copy All</strong> to paste
+      directly into MobileTech when finished.
 
-    <p><strong>Next Day</strong> adds a new date and starts fresh at Crew #1.</p>
+    
+  </p>
 
-    <p><strong>Crew sections</strong> can be expanded or collapsed.</p>
+  <hr>
 
-    <p><strong>Trucks</strong> must be exactly 4 digits. You can add or remove trucks individually. You will be warned if a truck is reused on the same day.</p>
+  <h4>1) Customer / Lease</h4>
+  <ul>
+    <li>Optional</li>
+    <li>Applies to <strong>all days</strong> below it</li>
+    <li>Shown once to keep daily notes clean</li>
+  </ul>
 
-    <p><strong>Rentals & Materials</strong> support multiple lines and include item, details, qty/distance, vendor, and PO.</p>
+  <p><strong>Example:</strong></p>
+  <pre>
+OXY USA – SCR Lease
+  </pre>
 
-    <p><strong>Copy All</strong> copies everything into MobileTech‑ready text.</p>
-  </div>
+  <hr>
+
+  <h4>2) Days & Next Day</h4>
+  <ul>
+    <li>Each date represents a separate work day</li>
+    <li><strong>Next Day</strong> adds a new date AND starts fresh at Crew #1</li>
+    <li>Customer & Lease carry forward automatically</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+03/18/26
+03/19/26
+  </pre>
+
+  <hr>
+
+  <h4>3) Crews</h4>
+  <ul>
+    <li>Each day starts with Crew #1 automatically</li>
+    <li>Use <strong>Add Crew</strong> for additional crews</li>
+    <li>Crews can be expanded or collapsed for easier review</li>
+    <li>If you delete a crew, remaining crews are renumbered automatically</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+Crew #1
+Crew #2
+  </pre>
+
+  <hr>
+
+  <h4>4) Crew Size & Members</h4>
+  <ul>
+    <li>Select the crew size</li>
+    <li>The correct number of Crew Member fields appears automatically</li>
+    <li>Names are free‑text</li>
+  </ul>
+
+  <hr>
+
+  <h4>5) Trucks</h4>
+  <ul>
+    <li>Each crew may have <strong>multiple trucks</strong></li>
+    <li>Truck numbers must be <strong>exactly 4 digits</strong></li>
+    <li>Letters or shorter numbers are not allowed</li>
+    <li>You can add or remove trucks individually</li>
+    <li>You will be warned if a truck is reused on the same day</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+Trucks: 2145, 3057
+  </pre>
+
+  <hr>
+
+  <h4>6) Start / Stop Time</h4>
+  <ul>
+    <li>Enter the time work started and stopped</li>
+    <li>Used for billing and audit clarity</li>
+  </ul>
+
+  <hr>
+
+  <h4>7) Work Performed</h4>
+  <ul>
+    <li>Describe what was done that day</li>
+    <li>Include delays, weather, standby, or extra work if applicable</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+Installed low pro units and staged pumps.
+Standby 1.5 hours due to weather delay.
+  </pre>
+
+  <hr>
+
+  <h4>8) Rentals</h4>
+  <ul>
+    <li>Add as many rental lines as needed</li>
+    <li>Each line includes:</li>
+    <ul>
+     <Job Item>
+      <li>Item / Unit</li>
+      <li>Details (HP, size, type)</li>
+      <li>Qty / Distance</li>
+      <li>Vendor</li>
+      <li>PO</li>
+    </ul>
+    <li>Each line can be removed individually</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+Low Pro – 600 HP – Qty 1 – Big D Pump – PO 12345
+  </pre>
+
+  <hr>
+
+  <h4>9) Materials</h4>
+  <ul>
+    <li>Same structure as Rentals</li>
+    <li>Use for materials consumed or sold to customer</li>
+  </ul>
+
+  <p><strong>Example:</strong></p>
+  <pre>
+4” Poly – SDR 11 – 1.3 miles – Yard – PO 67890
+  </pre>
+
+  <hr>
+
+  <h4>10) Copy All</h4>
+  <ul>
+    <li>Copies everything into clean, MobileTech‑ready text</li>
+    <li>Only filled fields appear</li>
+    <li>No extra labels or UI text are copied</li>
+  </ul>
+
+  <p><strong>Example Output:</strong></p>
+  <pre>
+OXY USA – SCR Lease
+
+03/18/26
+Crew #1
+Trucks: 2145, 3057
+John, Mike, Carlos
+Start: 0700   Stop: 1530
+Installed low pro units and staged pumps.
+
+Low Pro – 600 HP – Qty 1 – Big D Pump – PO 12345
+  </pre>
 </div>
 
 <script>
