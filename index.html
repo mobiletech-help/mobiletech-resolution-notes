@@ -6,8 +6,9 @@
 <title>MobileTech Resolution Notes</title>
 
 <style>
+/* ================= BASE ================= */
 body {
-  font-family: system-ui, Arial, sans-serif;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background:#f8fafc;
   margin:0;
 }
@@ -15,7 +16,7 @@ body {
   max-width:900px;
   margin:auto;
   padding:16px;
-  padding-bottom:220px;
+  padding-bottom:240px;
 }
 .top-bar {
   display:flex;
@@ -23,8 +24,10 @@ body {
   align-items:center;
   margin-bottom:12px;
 }
-h1 { margin:0; font-size:20px; }
-
+h1 {
+  margin:0;
+  font-size:20px;
+}
 button {
   padding:8px 12px;
   border-radius:6px;
@@ -37,7 +40,7 @@ button {
   color:#fff;
 }
 
-/* Cards & inputs */
+/* ================= CARD / INPUT ================= */
 .card {
   background:#fff;
   border:1px solid #e5e7eb;
@@ -56,21 +59,23 @@ input, textarea, select {
   padding:10px;
   border-radius:6px;
   border:2px solid #d1d5db;
+  font-size:14px;
 }
 input:focus, textarea:focus, select:focus {
   outline:none;
   border-color:#0f62fe;
   box-shadow:0 0 0 3px rgba(15,98,254,.25);
 }
-
 .row {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-@media(max-width:600px){ .row{grid-template-columns:1fr;} }
+@media(max-width:600px) {
+  .row { grid-template-columns:1fr; }
+}
 
-/* Crew collapse */
+/* ================= CREW COLLAPSE ================= */
 details.crew {
   border:1px solid #e5e7eb;
   border-radius:8px;
@@ -82,17 +87,22 @@ details summary {
   cursor:pointer;
   list-style:none;
 }
-summary::-webkit-details-marker{display:none;}
-summary::before{content:"▶";margin-right:6px;}
-details[open] summary::before{transform:rotate(90deg);}
-
+summary::-webkit-details-marker { display:none; }
+summary::before {
+  content:"▶";
+  margin-right:6px;
+}
+details[open] summary::before {
+  transform:rotate(90deg);
+  display:inline-block;
+}
 .crew-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
 }
 
-/* Line rows */
+/* ================= LINE ROWS ================= */
 .line-row {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px;
@@ -108,7 +118,7 @@ details[open] summary::before{transform:rotate(90deg);}
   cursor:pointer;
 }
 
-/* Help panel */
+/* ================= HELP PANEL ================= */
 .help-overlay {
   position:fixed;
   inset:0;
@@ -134,10 +144,12 @@ details[open] summary::before{transform:rotate(90deg);}
   cursor:pointer;
 }
 
-/* Bottom bar */
+/* ================= BOTTOM BAR ================= */
 .bottom-bar {
   position:fixed;
-  bottom:0; left:0; right:0;
+  bottom:0;
+  left:0;
+  right:0;
   background:#fff;
   border-top:1px solid #e5e7eb;
   display:flex;
@@ -156,7 +168,7 @@ details[open] summary::before{transform:rotate(90deg);}
   <button id="helpBtn">Help</button>
 </div>
 
-<!-- Smartfill datalists -->
+<!-- ============== SMARTFILL DATA LISTS ============== -->
 <datalist id="customerList"></datalist>
 <datalist id="locationList"></datalist>
 <datalist id="crewList"></datalist>
@@ -164,6 +176,7 @@ details[open] summary::before{transform:rotate(90deg);}
 <datalist id="itemList"></datalist>
 <datalist id="vendorList"></datalist>
 
+<!-- ============== JOB HEADER ============== -->
 <div class="card">
   <label>Customer</label>
   <input id="customer" list="customerList">
@@ -181,30 +194,39 @@ details[open] summary::before{transform:rotate(90deg);}
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- Help panel -->
+<!-- ============== HELP PANEL ============== -->
 <div class="help-overlay" id="helpOverlay">
-  <div class="help-panel">
-    <div class="help-close" id="helpClose">Close ✕</div>
+<div class="help-panel">
+<div class="help-close" id="helpClose">Close ✕</div>
 
-    <h3>How to use this page</h3>
+<h3>How to use this page</h3>
 
-    <p><strong>Customer / Lease</strong> are optional and apply to all days below.</p>
-    <p><strong>Next Day</strong> adds a new date and starts fresh with Crew #1.</p>
-    <p><strong>Crews</strong> can be expanded or collapsed.</p>
+<p><strong>Customer / Lease</strong> are optional and apply to all days.</p>
 
-    <h4>Trucks</h4>
-    <ul>
-      <li>Exactly 4 digits</li>
-      <li>Multiple trucks per crew allowed</li>
-      <li>You can add or remove trucks individually</li>
-      <li>You’ll be warned if a truck is reused on the same day</li>
-    </ul>
+<p><strong>Next Day</strong> adds a new date and resets to Crew #1.</p>
 
-    <h4>Rentals & Materials</h4>
-    <p>Each line includes Item, Details, Qty/Distance, Vendor, and PO.</p>
+<p><strong>Crews</strong> can be expanded or collapsed.</p>
 
-    <h4>Example Output</h4>
-    <pre>
+<h4>Trucks</h4>
+<ul>
+<li>Exactly 4 digits</li>
+<li>Multiple trucks per crew</li>
+<li>Remove individually</li>
+<li>Warning if reused on same day</li>
+</ul>
+
+<h4>Rentals & Materials</h4>
+<p>Each line includes:</p>
+<ul>
+<li>Item</li>
+<li>Details</li>
+<li>Qty / Distance</li>
+<li>Vendor</li>
+<li>PO</li>
+</ul>
+
+<h4>Example Output</h4>
+<pre>
 OXY USA – SCR Lease
 
 03/18/26
@@ -212,85 +234,107 @@ Crew #1
 Trucks: 2145, 3057
 John, Mike
 Start: 0700   Stop: 1530
-Installed pumps.
+Installed low pro pumps.
 
 Low Pro – 600 HP – Qty 1 – Big D Pump – PO 12345
-    </pre>
-  </div>
+</pre>
+</div>
 </div>
 
 <script>
-/* ---------- SMARTFILL CORE ---------- */
-function getStore(k){ return JSON.parse(localStorage.getItem(k)||"[]"); }
-function addStore(k,v){
-  if(!v) return;
-  const a=getStore(k);
-  if(!a.includes(v)){ a.push(v); localStorage.setItem(k,JSON.stringify(a)); }
+/* =====================================================
+   UTILITIES & SMARTFILL
+===================================================== */
+function getStore(key) {
+  return JSON.parse(localStorage.getItem(key) || "[]");
 }
-function loadStore(k,id){
-  const dl=document.getElementById(id);
-  dl.innerHTML="";
-  getStore(k).forEach(v=>{
-    const o=document.createElement("option");
-    o.value=v;
+function addStore(key, value) {
+  if (!value) return;
+  const arr = getStore(key);
+  if (!arr.includes(value)) {
+    arr.push(value);
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+}
+function loadStore(key, listId) {
+  const dl = document.getElementById(listId);
+  dl.innerHTML = "";
+  getStore(key).forEach(v => {
+    const o = document.createElement("option");
+    o.value = v;
     dl.appendChild(o);
   });
 }
 
-/* ---------- CREW ---------- */
-function updateCrewMembers(sel){
-  const grid=sel.closest("details").querySelector(".crew-grid");
-  const n=+sel.value;
-  grid.innerHTML="";
-  for(let i=0;i<n;i++){
-    const inp=document.createElement("input");
-    inp.placeholder=`Crew Member ${i+1}`;
-    inp.setAttribute("list","crewList");
-    inp.addEventListener("blur",()=>addStore("crew",inp.value));
+/* =====================================================
+   CREW LOGIC
+===================================================== */
+function updateCrewMembers(selectEl) {
+  const grid = selectEl.closest("details").querySelector(".crew-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i < selectEl.value; i++) {
+    const inp = document.createElement("input");
+    inp.placeholder = `Crew Member ${i + 1}`;
+    inp.setAttribute("list", "crewList");
+    inp.addEventListener("blur", () => addStore("crew", inp.value));
     grid.appendChild(inp);
   }
 }
 
-function addLine(container, isTruck=false){
-  const row=document.createElement("div");
-  row.className="line-row";
+function addLineRow(container, isTruck) {
+  const row = document.createElement("div");
+  row.className = "line-row";
 
-  if(isTruck){
-    const inp=document.createElement("input");
-    inp.placeholder="0000";
-    inp.maxLength=4;
-    inp.inputMode="numeric";
-    inp.setAttribute("list","truckList");
-    inp.addEventListener("input",()=>inp.value=inp.value.replace(/\D/g,"").slice(0,4));
-    inp.addEventListener("blur",()=>{
-      if(/^\d{4}$/.test(inp.value)){ addStore("trucks",inp.value); }
-      else if(inp.value){ alert("Truck # must be exactly 4 digits"); inp.value=""; }
+  if (isTruck) {
+    const inp = document.createElement("input");
+    inp.placeholder = "0000";
+    inp.maxLength = 4;
+    inp.inputMode = "numeric";
+    inp.setAttribute("list", "truckList");
+    inp.addEventListener("input", () => {
+      inp.value = inp.value.replace(/\D/g, "").slice(0, 4);
+    });
+    inp.addEventListener("blur", () => {
+      if (/^\d{4}$/.test(inp.value)) {
+        addStore("trucks", inp.value);
+      } else if (inp.value) {
+        alert("Truck # must be exactly 4 digits");
+        inp.value = "";
+      }
     });
     row.appendChild(inp);
   } else {
-    ["Item","Details","Qty / Distance","Vendor","PO"].forEach((ph,i)=>{
-      const inp=document.createElement("input");
-      inp.placeholder=ph;
-      if(ph==="Item"){ inp.setAttribute("list","itemList"); inp.addEventListener("blur",()=>addStore("items",inp.value)); }
-      if(ph==="Vendor"){ inp.setAttribute("list","vendorList"); inp.addEventListener("blur",()=>addStore("vendors",inp.value)); }
+    ["Item", "Details", "Qty / Distance", "Vendor", "PO"].forEach(ph => {
+      const inp = document.createElement("input");
+      inp.placeholder = ph;
+      if (ph === "Item") {
+        inp.setAttribute("list", "itemList");
+        inp.addEventListener("blur", () => addStore("items", inp.value));
+      }
+      if (ph === "Vendor") {
+        inp.setAttribute("list", "vendorList");
+        inp.addEventListener("blur", () => addStore("vendors", inp.value));
+      }
       row.appendChild(inp);
     });
   }
 
-  const rem=document.createElement("button");
-  rem.textContent="✕";
-  rem.className="remove-btn";
-  rem.onclick=()=>row.remove();
-  row.appendChild(rem);
+  const removeBtn = document.createElement("button");
+  removeBtn.textContent = "✕";
+  removeBtn.className = "remove-btn";
+  removeBtn.onclick = () => row.remove();
 
+  row.appendChild(removeBtn);
   container.appendChild(row);
 }
 
-function createCrew(num){
-  const d=document.createElement("details");
-  d.className="crew"; d.open=true;
-  d.innerHTML=`
-    <summary>Crew #${num}</summary>
+function createCrew(crewNum) {
+  const d = document.createElement("details");
+  d.className = "crew";
+  d.open = true;
+
+  d.innerHTML = `
+    <summary>Crew #${crewNum}</summary>
 
     <label>Trucks</label>
     <div class="trucks"></div>
@@ -298,18 +342,21 @@ function createCrew(num){
 
     <label>Crew size</label>
     <select>
-      <option value="1">1‑Man Crew</option>
-      <option value="2">2‑Man Crew</option>
-      <option value="3">3‑Man Crew</option>
-      <option value="4">4‑Man Crew</option>
-      <option value="5">5‑Man Crew</option>
+      <option value="1">1-Man Crew</option>
+      <option value="2">2-Man Crew</option>
+      <option value="3">3-Man Crew</option>
+      <option value="4">4-Man Crew</option>
+      <option value="5">5-Man Crew</option>
     </select>
 
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
     <label>Start / Stop</label>
-    <div class="row"><input type="time"><input type="time"></div>
+    <div class="row">
+      <input type="time">
+      <input type="time">
+    </div>
 
     <label>Work performed</label>
     <textarea></textarea>
@@ -325,82 +372,100 @@ function createCrew(num){
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  const sel=d.querySelector("select");
-  sel.addEventListener("change",()=>updateCrewMembers(sel));
-  updateCrewMembers(sel);
+  const select = d.querySelector("select");
+  select.addEventListener("change", () => updateCrewMembers(select));
+  updateCrewMembers(select);
 
-  d.querySelector(".addTruck").onclick=()=>addLine(d.querySelector(".trucks"),true);
-  addLine(d.querySelector(".trucks"),true);
+  d.querySelector(".addTruck").onclick = () =>
+    addLineRow(d.querySelector(".trucks"), true);
 
-  d.querySelector(".addRental").onclick=()=>addLine(d.querySelector(".rentals"));
-  d.querySelector(".addMaterial").onclick=()=>addLine(d.querySelector(".materials"));
+  d.querySelector(".addRental").onclick = () =>
+    addLineRow(d.querySelector(".rentals"), false);
 
-  d.querySelector(".removeCrew").onclick=()=>{
-    const p=d.parentElement;
+  d.querySelector(".addMaterial").onclick = () =>
+    addLineRow(d.querySelector(".materials"), false);
+
+  d.querySelector(".removeCrew").onclick = () => {
+    const parent = d.parentElement;
     d.remove();
-    [...p.querySelectorAll("details")].forEach((c,i)=>c.querySelector("summary").textContent=`Crew #${i+1}`);
+    [...parent.querySelectorAll("details")].forEach((c, i) => {
+      c.querySelector("summary").textContent = `Crew #${i + 1}`;
+    });
   };
+
   return d;
 }
 
-/* ---------- DAYS ---------- */
-function today(){ return new Date().toISOString().split("T")[0]; }
+/* =====================================================
+   DAYS
+===================================================== */
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+function addDay(dateValue) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<label>Date</label><input type="date" value="${dateValue}">`;
 
-function addDay(dt){
-  const card=document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<label>Date</label><input type="date" value="${dt}">`;
-
-  const crews=document.createElement("div");
+  const crews = document.createElement("div");
   crews.appendChild(createCrew(1));
 
-  const btn=document.createElement("button");
-  btn.textContent="Add Crew";
-  btn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
+  const btn = document.createElement("button");
+  btn.textContent = "Add Crew";
+  btn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
 
   card.appendChild(crews);
   card.appendChild(btn);
   document.getElementById("days").appendChild(card);
 }
 
-/* ---------- HELP ---------- */
-helpBtn.onclick=()=>helpOverlay.style.display="block";
-helpClose.onclick=()=>helpOverlay.style.display="none";
-helpOverlay.onclick=e=>{if(e.target===helpOverlay)helpOverlay.style.display="none";};
+/* =====================================================
+   INIT & EVENTS
+===================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  loadStore("customers", "customerList");
+  loadStore("locations", "locationList");
+  loadStore("crew", "crewList");
+  loadStore("trucks", "truckList");
+  loadStore("items", "itemList");
+  loadStore("vendors", "vendorList");
 
-/* ---------- INIT ---------- */
-document.addEventListener("DOMContentLoaded",()=>{
-  loadStore("customers","customerList");
-  loadStore("locations","locationList");
-  loadStore("crew","crewList");
-  loadStore("trucks","truckList");
-  loadStore("items","itemList");
-  loadStore("vendors","vendorList");
-
-  customer.addEventListener("blur",()=>addStore("customers",customer.value));
-  location.addEventListener("blur",()=>addStore("locations",location.value));
+  document.getElementById("customer").addEventListener("blur", e =>
+    addStore("customers", e.target.value)
+  );
+  document.getElementById("location").addEventListener("blur", e =>
+    addStore("locations", e.target.value)
+  );
 
   addDay(today());
 });
 
-nextDay.onclick=()=>{
-  const last=document.querySelector("#days .card:last-child input").value;
-  const d=new Date(last+"T00:00");
-  d.setDate(d.getDate()+1);
+document.getElementById("nextDay").onclick = () => {
+  const lastDate =
+    document.querySelector("#days .card:last-child input").value;
+  const d = new Date(lastDate + "T00:00");
+  d.setDate(d.getDate() + 1);
   addDay(d.toISOString().split("T")[0]);
 };
 
-clearAll.onclick=()=>{
-  if(confirm("Clear all?")){
-    document.getElementById("days").innerHTML="";
+document.getElementById("clearAll").onclick = () => {
+  if (confirm("Clear all entries?")) {
+    document.getElementById("days").innerHTML = "";
     addDay(today());
   }
 };
 
-copyAll.onclick=()=>{
-  alert("Copy All formatting can be finalized next.");
+document.getElementById("helpBtn").onclick =
+  () => (helpOverlay.style.display = "block");
+document.getElementById("helpClose").onclick =
+  () => (helpOverlay.style.display = "none");
+helpOverlay.onclick = e => {
+  if (e.target === helpOverlay) helpOverlay.style.display = "none";
+};
+
+document.getElementById("copyAll").onclick = () => {
+  alert("Copy All formatting can now be finalized.");
 };
 </script>
 </body>
 </html>
-``
