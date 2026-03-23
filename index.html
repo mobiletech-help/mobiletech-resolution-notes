@@ -6,7 +6,6 @@
 <title>MobileTech Resolution Notes</title>
 
 <style>
-/* ================= BASE ================= */
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background:#f8fafc;
@@ -16,7 +15,7 @@ body {
   max-width:900px;
   margin:auto;
   padding:16px;
-  padding-bottom:240px;
+  padding-bottom:260px;
 }
 .top-bar {
   display:flex;
@@ -40,7 +39,6 @@ button {
   color:#fff;
 }
 
-/* ================= CARD / INPUT ================= */
 .card {
   background:#fff;
   border:1px solid #e5e7eb;
@@ -48,12 +46,19 @@ button {
   padding:12px;
   margin-bottom:16px;
 }
+
 label {
   font-size:12px;
   font-weight:600;
   margin-top:10px;
   display:block;
 }
+.helper {
+  font-size:11px;
+  color:#6b7280;
+  margin-top:2px;
+}
+
 input, textarea, select {
   width:100%;
   padding:10px;
@@ -66,6 +71,7 @@ input:focus, textarea:focus, select:focus {
   border-color:#0f62fe;
   box-shadow:0 0 0 3px rgba(15,98,254,.25);
 }
+
 .row {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -75,7 +81,6 @@ input:focus, textarea:focus, select:focus {
   .row { grid-template-columns:1fr; }
 }
 
-/* ================= CREW COLLAPSE ================= */
 details.crew {
   border:1px solid #e5e7eb;
   border-radius:8px;
@@ -88,26 +93,19 @@ details summary {
   list-style:none;
 }
 summary::-webkit-details-marker { display:none; }
-summary::before {
-  content:"▶";
-  margin-right:6px;
-}
-details[open] summary::before {
-  transform:rotate(90deg);
-  display:inline-block;
-}
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); }
+
 .crew-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
 }
 
-/* ================= LINE ROWS ================= */
 .line-row {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px;
   gap:6px;
-  align-items:center;
   margin-top:6px;
 }
 .remove-btn {
@@ -118,7 +116,20 @@ details[open] summary::before {
   cursor:pointer;
 }
 
-/* ================= HELP PANEL ================= */
+.bottom-bar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#fff;
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
+}
+
+/* Help panel */
 .help-overlay {
   position:fixed;
   inset:0;
@@ -143,20 +154,6 @@ details[open] summary::before {
   color:#0f62fe;
   cursor:pointer;
 }
-
-/* ================= BOTTOM BAR ================= */
-.bottom-bar {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#fff;
-  border-top:1px solid #e5e7eb;
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  padding:10px;
-}
 </style>
 </head>
 
@@ -168,7 +165,7 @@ details[open] summary::before {
   <button id="helpBtn">Help</button>
 </div>
 
-<!-- ============== SMARTFILL DATA LISTS ============== -->
+<!-- SMARTFILL LISTS -->
 <datalist id="customerList"></datalist>
 <datalist id="locationList"></datalist>
 <datalist id="crewList"></datalist>
@@ -176,7 +173,6 @@ details[open] summary::before {
 <datalist id="itemList"></datalist>
 <datalist id="vendorList"></datalist>
 
-<!-- ============== JOB HEADER ============== -->
 <div class="card">
   <label>Customer</label>
   <input id="customer" list="customerList">
@@ -194,204 +190,206 @@ details[open] summary::before {
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- ============== HELP PANEL ============== -->
+<!-- HELP PANEL -->
 <div class="help-overlay" id="helpOverlay">
 <div class="help-panel">
 <div class="help-close" id="helpClose">Close ✕</div>
 
 <h3>How to use this page</h3>
 
-<p><strong>Customer / Lease</strong> are optional and apply to all days.</p>
-
+<p><strong>Customer / Lease</strong> apply to all days.</p>
 <p><strong>Next Day</strong> adds a new date and resets to Crew #1.</p>
 
-<p><strong>Crews</strong> can be expanded or collapsed.</p>
-
 <h4>Trucks</h4>
-<ul>
-<li>Exactly 4 digits</li>
-<li>Multiple trucks per crew</li>
-<li>Remove individually</li>
-<li>Warning if reused on same day</li>
-</ul>
+<p>Enter all trucks taken to the location. Truck numbers must be exactly 4 digits. Duplicate trucks on the same day are not allowed.</p>
 
-<h4>Rentals & Materials</h4>
-<p>Each line includes:</p>
-<ul>
-<li>Item</li>
-<li>Details</li>
-<li>Qty / Distance</li>
-<li>Vendor</li>
-<li>PO</li>
-</ul>
+<h4>Work Performed</h4>
+<p>Describe work completed during the day. Include delays, changes, or issues.</p>
+
+<h4>Rentals</h4>
+<p>Equipment left on location that will be returned later (pumps, generators, road crossings, automation, etc.).</p>
+
+<h4>Materials</h4>
+<p>Items or parts used or sold to the customer and not returned.</p>
 
 <h4>Example Output</h4>
 <pre>
-OXY USA – SCR Lease
+OXY USA – SCR LEASE
 
 03/18/26
 Crew #1
 Trucks: 2145, 3057
 John, Mike
-Start: 0700   Stop: 1530
-Installed low pro pumps.
+Start: 07:00   Stop: 15:30
+Installed low pro pumps. Weather delay 1.5 hours.
 
-Low Pro – 600 HP – Qty 1 – Big D Pump – PO 12345
+Rentals:
+• LP-600 – 600 HP – Qty 1 – BIG D PUMP – PO 12345
 </pre>
 </div>
 </div>
 
 <script>
 /* =====================================================
-   UTILITIES & SMARTFILL
+   SMARTFILL + STORAGE
 ===================================================== */
-function getStore(key) {
-  return JSON.parse(localStorage.getItem(key) || "[]");
-}
-function addStore(key, value) {
-  if (!value) return;
-  const arr = getStore(key);
-  if (!arr.includes(value)) {
-    arr.push(value);
-    localStorage.setItem(key, JSON.stringify(arr));
+function getStore(k){ return JSON.parse(localStorage.getItem(k)||"[]"); }
+function addStore(k,v){
+  if(!v) return;
+  const arr=getStore(k);
+  if(!arr.includes(v)){
+    arr.push(v);
+    localStorage.setItem(k,JSON.stringify(arr));
   }
 }
-function loadStore(key, listId) {
-  const dl = document.getElementById(listId);
-  dl.innerHTML = "";
-  getStore(key).forEach(v => {
-    const o = document.createElement("option");
-    o.value = v;
+function loadStore(k,id){
+  const dl=document.getElementById(id);
+  dl.innerHTML="";
+  getStore(k).forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v;
     dl.appendChild(o);
   });
 }
 
-/* =====================================================
-   CREW LOGIC
-===================================================== */
-function updateCrewMembers(selectEl) {
-  const grid = selectEl.closest("details").querySelector(".crew-grid");
-  grid.innerHTML = "";
-  for (let i = 0; i < selectEl.value; i++) {
-    const inp = document.createElement("input");
-    inp.placeholder = `Crew Member ${i + 1}`;
-    inp.setAttribute("list", "crewList");
-    inp.addEventListener("blur", () => addStore("crew", inp.value));
-    grid.appendChild(inp);
+/* Pre-seeded customers */
+const PRESEEDED_CUSTOMERS = [
+  "2STONE INDUSTRIES","APACHE","BIG D EQUIPMENT","BIG D CONSTRUCTION",
+  "BIG D WATER TREATMENT","BLACKBEARD","BLUE ARROW","CERTARUS","CHEVRON",
+  "CIRCLE S ENERGY","CITY OF MIDLAND","CIVITAS RESOURCES","CLEAR WATER",
+  "CONOCOPHILLIPS","DEEP BLUE OPERATING","DIAMONDBACK E&P",
+  "ELEVATE ENERGY SERVICES","FASKEN OIL & RANCH","HONCHO ENERGY GROUP",
+  "HONDO RESOURCES","MADDOG SERVICES","MIDLAND COUNTRY CLUB","ONE X",
+  "OVINTIV","OXY USA","OXYROCK OPERATING, LLC","PALOMA MIDSTREAM",
+  "PERMIAN RESOURCES","PETRO-HUNT","PETROPLEX ENERGY","RATTLER MIDSTREAM",
+  "SUMMIT PETROLEUM","VITAL ENERGY","VTX ENERGY","XTO ENERGY","ZARVONA ENERGY"
+];
+
+function seedCustomersOnce(){
+  if(getStore("customers").length===0){
+    PRESEEDED_CUSTOMERS.forEach(c=>addStore("customers",c));
   }
 }
 
-function addLineRow(container, isTruck) {
-  const row = document.createElement("div");
-  row.className = "line-row";
+/* =====================================================
+   TRUCK DUPLICATE RULE
+===================================================== */
+function blockDuplicateTruck(inp){
+  const val=inp.value;
+  const card=inp.closest(".card");
+  card.querySelectorAll(".trucks input").forEach(t=>{
+    if(t!==inp && t.value===val){
+      const crew=t.closest("details").querySelector("summary").textContent;
+      alert(`Truck #${val} is already assigned to ${crew} for this day.`);
+      inp.value="";
+      inp.focus();
+    }
+  });
+}
 
-  if (isTruck) {
-    const inp = document.createElement("input");
-    inp.placeholder = "0000";
-    inp.maxLength = 4;
-    inp.inputMode = "numeric";
-    inp.setAttribute("list", "truckList");
-    inp.addEventListener("input", () => {
-      inp.value = inp.value.replace(/\D/g, "").slice(0, 4);
-    });
-    inp.addEventListener("blur", () => {
-      if (/^\d{4}$/.test(inp.value)) {
-        addStore("trucks", inp.value);
-      } else if (inp.value) {
+/* =====================================================
+   LINE ROW
+===================================================== */
+function addLineRow(container,isTruck){
+  const row=document.createElement("div");
+  row.className="line-row";
+
+  if(isTruck){
+    const i=document.createElement("input");
+    i.placeholder="0000";
+    i.maxLength=4;
+    i.inputMode="numeric";
+    i.setAttribute("list","truckList");
+    i.oninput=()=>i.value=i.value.replace(/\D/g,"").slice(0,4);
+    i.onblur=()=>{
+      if(/^\d{4}$/.test(i.value)){
+        blockDuplicateTruck(i);
+        if(i.value) addStore("trucks",i.value);
+      } else if(i.value){
         alert("Truck # must be exactly 4 digits");
-        inp.value = "";
+        i.value="";
       }
-    });
-    row.appendChild(inp);
+    };
+    row.appendChild(i);
   } else {
-    ["Item", "Details", "Qty / Distance", "Vendor", "PO"].forEach(ph => {
-      const inp = document.createElement("input");
-      inp.placeholder = ph;
-      if (ph === "Item") {
-        inp.setAttribute("list", "itemList");
-        inp.addEventListener("blur", () => addStore("items", inp.value));
-      }
-      if (ph === "Vendor") {
-        inp.setAttribute("list", "vendorList");
-        inp.addEventListener("blur", () => addStore("vendors", inp.value));
-      }
-      row.appendChild(inp);
+    ["ITEM / UNIT #","DETAILS","QTY / DISTANCE","VENDOR","PO"].forEach(ph=>{
+      const i=document.createElement("input");
+      i.placeholder=ph;
+      if(ph==="ITEM / UNIT #"){i.setAttribute("list","itemList");i.onblur=()=>addStore("items",i.value);}
+      if(ph==="VENDOR"){i.setAttribute("list","vendorList");i.onblur=()=>addStore("vendors",i.value);}
+      row.appendChild(i);
     });
   }
 
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "✕";
-  removeBtn.className = "remove-btn";
-  removeBtn.onclick = () => row.remove();
-
-  row.appendChild(removeBtn);
+  const r=document.createElement("button");
+  r.textContent="✕";
+  r.className="remove-btn";
+  r.onclick=()=>row.remove();
+  row.appendChild(r);
   container.appendChild(row);
 }
 
-function createCrew(crewNum) {
-  const d = document.createElement("details");
-  d.className = "crew";
-  d.open = true;
+/* =====================================================
+   CREW
+===================================================== */
+function updateCrewMembers(sel){
+  const g=sel.closest("details").querySelector(".crew-grid");
+  g.innerHTML="";
+  for(let i=0;i<sel.value;i++){
+    const n=document.createElement("input");
+    n.placeholder=`Crew Member ${i+1}`;
+    n.setAttribute("list","crewList");
+    n.onblur=()=>addStore("crew",n.value);
+    g.appendChild(n);
+  }
+}
 
-  d.innerHTML = `
-    <summary>Crew #${crewNum}</summary>
+function createCrew(num){
+  const d=document.createElement("details");
+  d.className="crew";d.open=true;
+  d.innerHTML=`
+    <summary>Crew #${num}</summary>
 
     <label>Trucks</label>
+    <div class="helper">All trucks taken to the location for this crew.</div>
     <div class="trucks"></div>
     <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
-    <select>
-      <option value="1">1-Man Crew</option>
-      <option value="2">2-Man Crew</option>
-      <option value="3">3-Man Crew</option>
-      <option value="4">4-Man Crew</option>
-      <option value="5">5-Man Crew</option>
-    </select>
+    <select><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
 
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
-    <label>Start / Stop</label>
-    <div class="row">
-      <input type="time">
-      <input type="time">
-    </div>
+    <label>Start / Stop Time</label>
+    <div class="helper">Enter actual start and stop times.</div>
+    <div class="row"><input type="time"><input type="time"></div>
 
-    <label>Work performed</label>
+    <label>Work Performed</label>
+    <div class="helper">Describe work completed during the day. Include delays, changes, or issues.</div>
     <textarea></textarea>
 
-    <label>Rental</label>
+    <label>Rentals (Equipment left on location – returning)</label>
+    <div class="helper">Equipment left on location that will be returned later.</div>
     <div class="rentals"></div>
     <button class="addRental">Add Rental</button>
 
-    <label>Material</label>
+    <label>Materials (Used or sold – not returning)</label>
+    <div class="helper">Materials or parts used or sold to the customer.</div>
     <div class="materials"></div>
     <button class="addMaterial">Add Material</button>
 
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  const select = d.querySelector("select");
-  select.addEventListener("change", () => updateCrewMembers(select));
-  updateCrewMembers(select);
+  const sel=d.querySelector("select");
+  sel.onchange=()=>updateCrewMembers(sel);
+  updateCrewMembers(sel);
 
-  d.querySelector(".addTruck").onclick = () =>
-    addLineRow(d.querySelector(".trucks"), true);
-
-  d.querySelector(".addRental").onclick = () =>
-    addLineRow(d.querySelector(".rentals"), false);
-
-  d.querySelector(".addMaterial").onclick = () =>
-    addLineRow(d.querySelector(".materials"), false);
-
-  d.querySelector(".removeCrew").onclick = () => {
-    const parent = d.parentElement;
-    d.remove();
-    [...parent.querySelectorAll("details")].forEach((c, i) => {
-      c.querySelector("summary").textContent = `Crew #${i + 1}`;
-    });
-  };
+  d.querySelector(".addTruck").onclick=()=>addLineRow(d.querySelector(".trucks"),true);
+  d.querySelector(".addRental").onclick=()=>addLineRow(d.querySelector(".rentals"),false);
+  d.querySelector(".addMaterial").onclick=()=>addLineRow(d.querySelector(".materials"),false);
+  d.querySelector(".removeCrew").onclick=()=>d.remove();
 
   return d;
 }
@@ -399,73 +397,96 @@ function createCrew(crewNum) {
 /* =====================================================
    DAYS
 ===================================================== */
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-function addDay(dateValue) {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<label>Date</label><input type="date" value="${dateValue}">`;
-
-  const crews = document.createElement("div");
+function today(){return new Date().toISOString().split("T")[0];}
+function addDay(dt){
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML=`<label>Date</label><input type="date" value="${dt}">`;
+  const crews=document.createElement("div");
   crews.appendChild(createCrew(1));
-
-  const btn = document.createElement("button");
-  btn.textContent = "Add Crew";
-  btn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
-
-  card.appendChild(crews);
-  card.appendChild(btn);
-  document.getElementById("days").appendChild(card);
+  const b=document.createElement("button");
+  b.textContent="Add Crew";
+  b.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
+  c.appendChild(crews);
+  c.appendChild(b);
+  document.getElementById("days").appendChild(c);
 }
+
+/* =====================================================
+   COPY ALL
+===================================================== */
+document.getElementById("copyAll").onclick=()=>{
+  let out=[];
+  const cust=document.getElementById("customer").value.trim();
+  const loc=document.getElementById("location").value.trim();
+  if(cust||loc) out.push([cust,loc].filter(Boolean).join(" – "),"");
+
+  document.querySelectorAll("#days .card").forEach(day=>{
+    const d=new Date(day.querySelector('input[type="date"]').value+"T00");
+    out.push(`${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`);
+    day.querySelectorAll("details.crew").forEach(cr=>{
+      out.push(cr.querySelector("summary").textContent);
+      const trucks=[...cr.querySelectorAll(".trucks input")].map(i=>i.value).filter(v=>v);
+      if(trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
+      const members=[...cr.querySelectorAll(".crew-grid input")].map(i=>i.value).filter(v=>v);
+      if(members.length) out.push(members.join(", "));
+      const t=cr.querySelectorAll('input[type="time"]');
+      if(t[0].value||t[1].value) out.push(`Start: ${t[0].value}   Stop: ${t[1].value}`);
+      const w=cr.querySelector("textarea").value.trim(); if(w) out.push(w);
+
+      const rentals=[...cr.querySelectorAll(".rentals .line-row input")].map(i=>i.value).filter(v=>v);
+      if(rentals.length){ out.push("","Rentals:"); out.push(`• ${rentals.join(" – ")}`); }
+
+      const mats=[...cr.querySelectorAll(".materials .line-row input")].map(i=>i.value).filter(v=>v);
+      if(mats.length){ out.push("","Materials:"); out.push(`• ${mats.join(" – ")}`); }
+
+      out.push("");
+    });
+    out.push("");
+  });
+
+  navigator.clipboard.writeText(out.join("\n").trim());
+  alert("Copied to clipboard.");
+};
 
 /* =====================================================
    INIT & EVENTS
 ===================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  loadStore("customers", "customerList");
-  loadStore("locations", "locationList");
-  loadStore("crew", "crewList");
-  loadStore("trucks", "truckList");
-  loadStore("items", "itemList");
-  loadStore("vendors", "vendorList");
+document.addEventListener("DOMContentLoaded",()=>{
+  seedCustomersOnce();
+  loadStore("customers","customerList");
+  loadStore("locations","locationList");
+  loadStore("crew","crewList");
+  loadStore("trucks","truckList");
+  loadStore("items","itemList");
+  loadStore("vendors","vendorList");
 
-  document.getElementById("customer").addEventListener("blur", e =>
-    addStore("customers", e.target.value)
-  );
-  document.getElementById("location").addEventListener("blur", e =>
-    addStore("locations", e.target.value)
-  );
+  const custInput=document.getElementById("customer");
+  const locInput=document.getElementById("location");
+
+  custInput.oninput=e=>e.target.value=e.target.value.toUpperCase();
+  custInput.onblur=e=>addStore("customers",e.target.value);
+
+  locInput.oninput=e=>e.target.value=e.target.value.toUpperCase();
+  locInput.onblur=e=>addStore("locations",e.target.value);
 
   addDay(today());
 });
 
-document.getElementById("nextDay").onclick = () => {
-  const lastDate =
-    document.querySelector("#days .card:last-child input").value;
-  const d = new Date(lastDate + "T00:00");
-  d.setDate(d.getDate() + 1);
-  addDay(d.toISOString().split("T")[0]);
+document.getElementById("nextDay").onclick=()=>{
+  const last=new Date(document.querySelector("#days .card:last-child input").value+"T00");
+  last.setDate(last.getDate()+1);
+  addDay(last.toISOString().split("T")[0]);
 };
-
-document.getElementById("clearAll").onclick = () => {
-  if (confirm("Clear all entries?")) {
-    document.getElementById("days").innerHTML = "";
+document.getElementById("clearAll").onclick=()=>{
+  if(confirm("Clear all entries?")){
+    document.getElementById("days").innerHTML="";
     addDay(today());
   }
 };
-
-document.getElementById("helpBtn").onclick =
-  () => (helpOverlay.style.display = "block");
-document.getElementById("helpClose").onclick =
-  () => (helpOverlay.style.display = "none");
-helpOverlay.onclick = e => {
-  if (e.target === helpOverlay) helpOverlay.style.display = "none";
-};
-
-document.getElementById("copyAll").onclick = () => {
-  alert("Copy All formatting can now be finalized.");
-};
+document.getElementById("helpBtn").onclick=()=>helpOverlay.style.display="block";
+document.getElementById("helpClose").onclick=()=>helpOverlay.style.display="none";
+helpOverlay.onclick=e=>{ if(e.target===helpOverlay) helpOverlay.style.display="none"; };
 </script>
 </body>
 </html>
