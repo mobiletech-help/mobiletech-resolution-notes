@@ -1,17 +1,3 @@
-<!-- Template V1.2-dev (Sandbox)
-     Base: Template V1.1-dev confirmed good
-     Additions/Fixes in this file:
-       • Truck section: each truck has its own ✕ delete button (line-row)
-       • 4-digit truck enforcement + same-day duplicate hard-block with crew name
-       • Copy All includes Trucks, Crew Members, Times, Work, Rentals, Materials (skips empty)
-       • Next Day reliably adds new date + fresh Crew #1 (Customer/Lease remain at top)
-       • On-page helper instructions for all sections
-       • Crew size labels '1‑MAN', '2‑MAN', '3‑MAN', ...
-       • Customer smart-fill (static + learning) and ALL CAPS
-       • Lease/Location ALL CAPS
-       • Delete Crew renumbers within the day
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -291,7 +277,7 @@ function createCrew(num) {
   sel.onchange = () => updateCrewMembers(sel);
   updateCrewMembers(sel);
 
-  // Add Truck → now creates a row with input + ✕ remove
+  // Add Truck → row with input + ✕
   d.querySelector(".addTruck").onclick = () => {
     const row = document.createElement("div");
     row.className = "line-row";
@@ -349,12 +335,27 @@ function addDay(dateStr) {
   const crews = document.createElement("div");
   crews.appendChild(createCrew(1));
 
+  const controls = document.createElement("div");
   const addCrewBtn = document.createElement("button");
   addCrewBtn.textContent = "Add Crew";
   addCrewBtn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
 
+  const deleteDayBtn = document.createElement("button");
+  deleteDayBtn.textContent = "Delete Day";
+  deleteDayBtn.onclick = () => {
+    if (confirm("Delete this day and all its crews?")) {
+      card.remove();
+      if (document.querySelectorAll("#days .card").length === 0) {
+        addDay(today());
+      }
+    }
+  };
+
+  controls.appendChild(addCrewBtn);
+  controls.appendChild(deleteDayBtn);
+
   card.appendChild(crews);
-  card.appendChild(addCrewBtn);
+  card.appendChild(controls);
   document.getElementById("days").appendChild(card);
 }
 
@@ -446,9 +447,11 @@ document.addEventListener("DOMContentLoaded", () => {
     addDay(d.toISOString().split("T")[0]);
   };
 
-  // Clear All
+  // Clear All — now also clears Customer & Lease/Location fields
   document.getElementById("clearAll").onclick = () => {
     if (confirm("Clear all entries?")) {
+      document.getElementById("customer").value = "";
+      document.getElementById("location").value = "";
       document.getElementById("days").innerHTML = "";
       addDay(today());
     }
