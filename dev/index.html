@@ -1,62 +1,88 @@
 <!-- Template V1.2-dev (Sandbox)
-     Base: Template V1.1-dev
-     Additions: static customer list, improved Next Day logic, expanded Help pane -->
+     Base: Template V1.1-dev confirmed good
+     Additions/Fixes in this file:
+       • Truck section fully restored + helper text
+       • 4-digit truck enforcement + same-day duplicate hard-block with crew name
+       • Copy All includes Trucks, Crew Members, Times, Work, Rentals, Materials
+       • Next Day reliably adds new date + fresh Crew #1
+       • On-page helper instructions for all sections
+       • Crew size labels '1‑MAN', '2‑MAN', '3‑MAN', ...
+       • Customer smart-fill (static + learning) and ALL CAPS
+       • Lease/Location ALL CAPS
+       • Delete Crew renumbers within the day
+-->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MobileTech Resolution Notes</title>
 
 <style>
-/* --- styling unchanged from V1.1-dev --- */
+/* ---- Base Layout ---- */
 body { font-family: system-ui, Arial, sans-serif; background:#f8fafc; margin:0; }
 .wrapper { max-width:900px; margin:auto; padding:16px; padding-bottom:240px; }
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-h1{margin:0;font-size:20px}
-button{padding:8px 12px;border-radius:6px;border:1px solid #d1d5db;background:#fff;cursor:pointer}
-.primary{background:#0f62fe;color:#fff}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:16px}
-label{font-size:12px;font-weight:600;margin-top:10px;display:block}
-.helper{font-size:11px;color:#6b7280;margin-bottom:4px}
-input,textarea,select{width:100%;padding:10px;border-radius:6px;border:2px solid #d1d5db}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-details.crew{border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-top:12px}
-details summary{font-weight:700;cursor:pointer;list-style:none}
-summary::-webkit-details-marker{display:none}
-summary::before{content:"▶";margin-right:6px}
-details[open] summary::before{transform:rotate(90deg)}
-.crew-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
-.line-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px;gap:6px;margin-top:6px}
-.remove-btn{background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer}
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;justify-content:center;gap:8px;padding:10px}
-.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:100}
-.help-panel{position:absolute;right:0;top:0;width:420px;height:100%;background:#fff;padding:16px;overflow-y:auto}
-.help-close{text-align:right;font-weight:600;color:#0f62fe;cursor:pointer}
+
+.top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+h1 { margin:0; font-size:20px; }
+
+button { padding:8px 12px; border-radius:6px; border:1px solid #d1d5db; background:#fff; cursor:pointer; }
+.primary { background:#0f62fe; color:#fff; }
+
+.card { background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; margin-bottom:16px; }
+label { font-size:12px; font-weight:600; margin-top:10px; display:block; }
+.helper { font-size:11px; color:#6b7280; margin-bottom:4px; }
+
+input, textarea, select { width:100%; padding:10px; border-radius:6px; border:2px solid #d1d5db; font-size:14px; }
+input:focus, textarea:focus, select:focus { outline:none; border-color:#0f62fe; box-shadow:0 0 0 3px rgba(15,98,254,.25); }
+
+.row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:600px) { .row { grid-template-columns:1fr; } }
+
+/* ---- Crew collapse ---- */
+details.crew { border:1px solid #e5e7eb; border-radius:8px; padding:8px; margin-top:12px; }
+details summary { font-weight:700; cursor:pointer; list-style:none; }
+summary::-webkit-details-marker { display:none; }
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); display:inline-block; }
+
+.crew-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; }
+
+/* ---- Repeating line rows (rentals/materials) ---- */
+.line-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px; gap:6px; margin-top:6px; align-items:center; }
+.remove-btn { background:#ef4444; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+
+/* ---- Bottom bar ---- */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #e5e7eb; display:flex; justify-content:center; gap:8px; padding:10px; }
+
+/* ---- Help pane ---- */
+.help-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; z-index:100; }
+.help-panel { position:absolute; right:0; top:0; width:420px; max-width:100%; height:100%; background:#fff; padding:16px; overflow-y:auto; }
+.help-close { text-align:right; font-weight:600; color:#0f62fe; cursor:pointer; }
 </style>
 </head>
 
 <body>
 <div class="wrapper">
 
-<div class="top-bar">
-  <h1>MobileTech Resolution Notes</h1>
-  <button id="helpBtn">Help</button>
-</div>
+  <div class="top-bar">
+    <h1>MobileTech Resolution Notes</h1>
+    <button id="helpBtn">Help</button>
+  </div>
 
-<!-- CUSTOMER SMARTFILL -->
-<datalist id="customerList"></datalist>
+  <!-- Customer smart-fill list -->
+  <datalist id="customerList"></datalist>
 
-<div class="card">
-  <label>Customer</label>
-  <input id="customer" list="customerList">
+  <div class="card">
+    <label>Customer</label>
+    <input id="customer" list="customerList" />
 
-  <label>Lease / Location</label>
-  <input id="location">
-</div>
+    <label>Lease / Location</label>
+    <input id="location" />
+  </div>
 
-<div id="days"></div>
+  <div id="days"></div>
 </div>
 
 <div class="bottom-bar">
@@ -65,53 +91,63 @@ details[open] summary::before{transform:rotate(90deg)}
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- HELP PANE -->
+<!-- Help Pane -->
 <div class="help-overlay" id="helpOverlay">
-<div class="help-panel">
-<div class="help-close" id="helpClose">Close ✕</div>
+  <div class="help-panel">
+    <div class="help-close" id="helpClose">Close ✕</div>
 
-<h3>How to Use This Page</h3>
-<p>This tool creates clean, consistent MobileTech resolution notes. Use <strong>Copy All</strong> when finished.</p>
+    <h3>How to Use This Page</h3>
+    <p>This tool creates clean, consistent MobileTech resolution notes. Use <strong>Copy All</strong> when finished.</p>
 
-<h4>Customer / Lease</h4>
-<p>Customer and Lease / Location apply to all days unless changed.</p>
+    <hr />
+    <h4>Customer / Lease</h4>
+    <p>Customer and Lease / Location apply to all days unless changed.</p>
 
-<h4>Trucks</h4>
-<p>Enter all trucks taken to the location, even briefly.</p>
-<ul>
-  <li>Exactly 4 digits</li>
-  <li>Duplicate trucks on the same day are blocked</li>
-</ul>
+    <hr />
+    <h4>Trucks</h4>
+    <p>Enter all trucks taken to the location, even briefly.</p>
+    <ul>
+      <li>Truck numbers must be exactly 4 digits</li>
+      <li>Duplicate trucks on the same day are blocked and will identify the other crew</li>
+    </ul>
 
-<h4>Start / Stop Time</h4>
-<p>Use actual start and stop times for billing accuracy.</p>
+    <hr />
+    <h4>Start / Stop Time</h4>
+    <p>Use actual start and stop times for billing accuracy.</p>
 
-<h4>Work Performed</h4>
-<p>Describe completed work and <strong>include any delays, changes, or issues</strong>.</p>
-<pre>
-Installed pumps and staged equipment.
-Weather delay approximately 1.5 hours.
-Additional work added per customer request.
-</pre>
+    <hr />
+    <h4>Work Performed</h4>
+    <p>Describe work completed during the day. Include delays, changes, added requests, or issues.</p>
+    <pre>Installed pumps and staged equipment.
+Weather delay approx. 1.5 hours.
+Additional work added per customer request.</pre>
 
-<h4>Rentals (Returning Equipment)</h4>
-<p>Equipment left on location that will be returned later.</p>
-<pre>Pumps, generators, automation, road crossings</pre>
+    <hr />
+    <h4>Rentals (Returning)</h4>
+    <p>Equipment left on location that will be returned later. Examples: pumps, generators, automation, road crossings, flowmeters.</p>
 
-<h4>Materials (Not Returning)</h4>
-<p>Items used or sold to the customer.</p>
-<pre>Liner, fuel, clamps, fittings</pre>
+    <hr />
+    <h4>Materials (Not Returning)</h4>
+    <p>Items used or sold to the customer. Examples: liner, fuel, clamps, fittings.</p>
 
-<h4>Copy All</h4>
-<p>Copies only formatted, entered data. Empty sections are omitted.</p>
-</div>
+    <hr />
+    <h4>Copy All</h4>
+    <p>Copies only entered data into clean MobileTech‑ready text.</p>
+  </div>
 </div>
 
 <script>
-/* ===== UTILITIES ===== */
-function today(){ return new Date().toISOString().split("T")[0]; }
+/* =================== Utilities =================== */
+function today() { return new Date().toISOString().split("T")[0]; }
+function fmtDateMMDDYY(v) {
+  const d = new Date(v + "T00:00");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${mm}/${dd}/${yy}`;
+}
 
-/* ===== CUSTOMER STATIC LIST ===== */
+/* =================== Customer Smart-fill (static + learning) =================== */
 const STATIC_CUSTOMERS = [
   "2STONE INDUSTRIES","APACHE","BIG D EQUIPMENT","BIG D CONSTRUCTION",
   "BIG D WATER TREATMENT","BLACKBEARD","BLUE ARROW","CERTARUS","CHEVRON",
@@ -124,166 +160,301 @@ const STATIC_CUSTOMERS = [
   "SUMMIT PETROLEUM","VITAL ENERGY","VTX ENERGY","XTO ENERGY","ZARVONA ENERGY"
 ];
 
-function getCustomers(){ return JSON.parse(localStorage.getItem("customers") || "[]"); }
-function saveCustomer(v){
-  if(!v)return;
-  v=v.toUpperCase();
-  const arr=getCustomers();
-  if(!arr.includes(v)){ arr.push(v); localStorage.setItem("customers",JSON.stringify(arr)); }
+function getCustomers() {
+  return JSON.parse(localStorage.getItem("customers") || "[]");
 }
-function seedCustomers(){
-  const arr=getCustomers();
-  STATIC_CUSTOMERS.forEach(c=>{
-    if(!arr.includes(c)) arr.push(c);
-  });
-  localStorage.setItem("customers",JSON.stringify(arr));
+function saveCustomer(value) {
+  if (!value) return;
+  value = value.toUpperCase();
+  const arr = getCustomers();
+  if (!arr.includes(value)) {
+    arr.push(value);
+    localStorage.setItem("customers", JSON.stringify(arr));
+  }
 }
-function loadCustomerList(){
-  const dl=document.getElementById("customerList");
-  dl.innerHTML="";
-  getCustomers().forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c;
-    dl.appendChild(o);
+function seedCustomersOnce() {
+  const arr = getCustomers();
+  let seeded = false;
+  STATIC_CUSTOMERS.forEach(c => { if (!arr.includes(c)) { arr.push(c); seeded = true; }});
+  if (seeded) localStorage.setItem("customers", JSON.stringify(arr));
+}
+function loadCustomerList() {
+  const dl = document.getElementById("customerList");
+  dl.innerHTML = "";
+  getCustomers().forEach(c => {
+    const o = document.createElement("option"); o.value = c; dl.appendChild(o);
   });
 }
 
-/* ===== CREW LOGIC (unchanged from V1.1-dev) ===== */
-function updateCrewMembers(sel){
-  const g=sel.closest("details").querySelector(".crew-grid");
-  g.innerHTML="";
-  for(let i=0;i<sel.value;i++){
-    const iEl=document.createElement("input");
-    iEl.placeholder=`Crew Member ${i+1}`;
-    g.appendChild(iEl);
+/* =================== Truck Rules =================== */
+/* Enforce numeric-only, exactly 4 digits on input; block same-day duplicates identifying other crew */
+function enforceTruckFormat(input) {
+  input.value = input.value.replace(/\D/g,"").slice(0,4);
+}
+function blockDuplicateTruck(input) {
+  const val = input.value;
+  if (!/^\d{4}$/.test(val)) return;
+
+  const dayCard = input.closest(".card");
+  const thisCrew = input.closest("details").querySelector("summary").textContent;
+
+  const allTruckInputs = dayCard.querySelectorAll(".trucks input");
+  for (const other of allTruckInputs) {
+    if (other === input) continue;
+    if (other.value === val) {
+      const otherCrew = other.closest("details").querySelector("summary").textContent;
+      alert(`Truck #${val} is already assigned to ${otherCrew} for this day.`);
+      input.value = "";
+      input.focus();
+      return;
+    }
   }
 }
 
-function addRow(container, placeholders){
-  const row=document.createElement("div");
-  row.className="line-row";
-  placeholders.forEach(ph=>{
-    const i=document.createElement("input");
-    i.placeholder=ph;
-    row.appendChild(i);
+/* =================== Crew helpers =================== */
+function updateCrewMembers(sel) {
+  const grid = sel.closest("details").querySelector(".crew-grid");
+  grid.innerHTML = "";
+  const count = parseInt(sel.value, 10) || 0;
+  for (let i = 0; i < count; i++) {
+    const iEl = document.createElement("input");
+    iEl.placeholder = `Crew Member ${i+1}`;
+    grid.appendChild(iEl);
+  }
+}
+
+function addRow(container, placeholders) {
+  const row = document.createElement("div");
+  row.className = "line-row";
+  placeholders.forEach(ph => {
+    const inp = document.createElement("input");
+    inp.placeholder = ph;
+    row.appendChild(inp);
   });
-  const r=document.createElement("button");
-  r.textContent="✕"; r.className="remove-btn";
-  r.onclick=()=>row.remove();
-  row.appendChild(r);
+  const rm = document.createElement("button");
+  rm.className = "remove-btn";
+  rm.textContent = "✕";
+  rm.onclick = () => row.remove();
+  row.appendChild(rm);
   container.appendChild(row);
 }
 
-function createCrew(num){
-  const d=document.createElement("details");
-  d.className="crew"; d.open=true;
+/* =================== Create Crew =================== */
+function createCrew(num) {
+  const d = document.createElement("details");
+  d.className = "crew";
+  d.open = true;
 
-  d.innerHTML=`
+  d.innerHTML = `
     <summary>Crew #${num}</summary>
 
+    <label>Trucks</label>
+    <div class="helper">All trucks taken to the location for this crew.</div>
+    <div class="trucks"></div>
+    <button class="addTruck">Add Truck</button>
+
     <label>Crew size</label>
-    <select><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+    <select>
+      <option value="1">1‑MAN</option>
+      <option value="2">2‑MAN</option>
+      <option value="3">3‑MAN</option>
+      <option value="4">4‑MAN</option>
+      <option value="5">5‑MAN</option>
+    </select>
 
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
     <label>Start / Stop Time</label>
-    <div class="row"><input type="time"><input type="time"></div>
+    <div class="helper">Enter actual start and stop times.</div>
+    <div class="row">
+      <input type="time">
+      <input type="time">
+    </div>
 
     <label>Work Performed</label>
+    <div class="helper">Describe work completed during the day. Include delays, changes, or issues.</div>
     <textarea></textarea>
 
-    <label>Rentals</label>
+    <label>Rentals (Equipment left on location – returning)</label>
+    <div class="helper">Equipment left on location that will be returned later.</div>
     <div class="rentals"></div>
     <button class="addRental">Add Rental</button>
 
-    <label>Materials</label>
+    <label>Materials (Used or sold – not returning)</label>
+    <div class="helper">Materials or parts used or sold to the customer.</div>
     <div class="materials"></div>
     <button class="addMaterial">Add Material</button>
 
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  const sel=d.querySelector("select");
-  sel.onchange=()=>updateCrewMembers(sel);
+  // Crew size → members
+  const sel = d.querySelector("select");
+  sel.onchange = () => updateCrewMembers(sel);
   updateCrewMembers(sel);
 
-  d.querySelector(".addRental").onclick=()=>addRow(d.querySelector(".rentals"),
-    ["Item / Unit #","Details","Qty / Distance","Vendor","PO"]);
-  d.querySelector(".addMaterial").onclick=()=>addRow(d.querySelector(".materials"),
-    ["Item / Description","Details","Qty","Vendor","PO"]);
-  d.querySelector(".removeCrew").onclick=()=>d.remove();
+  // Add Truck button
+  d.querySelector(".addTruck").onclick = () => {
+    const t = document.createElement("input");
+    t.placeholder = "0000";
+    t.maxLength = 4;
+    t.inputMode = "numeric";
+    t.oninput = () => enforceTruckFormat(t);
+    t.onblur = () => {
+      if (t.value && !/^\d{4}$/.test(t.value)) {
+        alert("Truck number must be exactly 4 digits");
+        t.value = "";
+        return;
+      }
+      blockDuplicateTruck(t);
+    };
+    d.querySelector(".trucks").appendChild(t);
+  };
+
+  // Rentals / Materials adders
+  d.querySelector(".addRental").onclick = () =>
+    addRow(d.querySelector(".rentals"), ["Item / Unit #","Details","Qty / Distance","Vendor","PO"]);
+
+  d.querySelector(".addMaterial").onclick = () =>
+    addRow(d.querySelector(".materials"), ["Item / Description","Details","Qty","Vendor","PO"]);
+
+  // Delete Crew with renumbering
+  d.querySelector(".removeCrew").onclick = () => {
+    const dayContainer = d.parentElement; // the wrapper that holds crews
+    d.remove();
+    // Renumber remaining crews inside this day only
+    [...dayContainer.querySelectorAll("details.crew")].forEach((crewEl, idx) => {
+      const sm = crewEl.querySelector("summary");
+      if (sm) sm.textContent = `Crew #${idx+1}`;
+    });
+  };
+
   return d;
 }
 
-/* ===== DAY ===== */
-function addDay(date){
-  const c=document.createElement("div");
-  c.className="card";
-  c.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
-  const crews=document.createElement("div");
+/* =================== Day =================== */
+function addDay(dateStr) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<label>Date</label><input type="date" value="${dateStr}" />`;
+
+  const crews = document.createElement("div");
   crews.appendChild(createCrew(1));
-  const b=document.createElement("button");
-  b.textContent="Add Crew";
-  b.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
-  c.appendChild(crews);
-  c.appendChild(b);
-  document.getElementById("days").appendChild(c);
+
+  const addCrewBtn = document.createElement("button");
+  addCrewBtn.textContent = "Add Crew";
+  addCrewBtn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
+
+  card.appendChild(crews);
+  card.appendChild(addCrewBtn);
+  document.getElementById("days").appendChild(card);
 }
 
-/* ===== NEXT DAY BEHAVIOR ===== */
-nextDay.onclick=()=>{
-  const last=document.querySelector("#days .card:last-child input").value;
-  const d=new Date(last+"T00");
-  d.setDate(d.getDate()+1);
-  addDay(d.toISOString().split("T")[0]);
-};
+/* =================== Copy All =================== */
+document.getElementById("copyAll").onclick = () => {
+  let out = [];
 
-/* ===== CLEAR ALL ===== */
-clearAll.onclick=()=>{
-  if(confirm("Clear all entries?")){
-    days.innerHTML="";
-    addDay(today());
-  }
-};
+  // Header
+  const cust = document.getElementById("customer").value.trim();
+  const loc  = document.getElementById("location").value.trim();
+  if (cust || loc) out.push([cust, loc].filter(Boolean).join(" – "), "");
 
-/* ===== COPY ALL ===== */
-copyAll.onclick=()=>{
-  let out=[];
-  if(customer.value||location.value){
-    out.push([customer.value,location.value].filter(Boolean).join(" – "));
-    out.push("");
-  }
+  // Each day
+  document.querySelectorAll("#days .card").forEach(day => {
+    const dateVal = day.querySelector('input[type="date"]').value;
+    out.push(fmtDateMMDDYY(dateVal));
 
-  document.querySelectorAll("#days .card").forEach(day=>{
-    out.push(day.querySelector("input[type=date]").value);
-    day.querySelectorAll("details.crew").forEach(cr=>{
+    // Each crew
+    day.querySelectorAll("details.crew").forEach(cr => {
       out.push(cr.querySelector("summary").textContent);
-      const notes=cr.querySelector("textarea").value.trim();
-      if(notes) out.push(notes);
-      out.push("");
+
+      // Trucks
+      const trucks = [...cr.querySelectorAll(".trucks input")]
+        .map(i => i.value.trim())
+        .filter(Boolean);
+      if (trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
+
+      // Crew members
+      const members = [...cr.querySelectorAll(".crew-grid input")]
+        .map(i => i.value.trim())
+        .filter(Boolean);
+      if (members.length) out.push(members.join(", "));
+
+      // Times
+      const times = cr.querySelectorAll('input[type="time"]');
+      const start = times[0]?.value || "";
+      const stop  = times[1]?.value || "";
+      if (start || stop) out.push(`Start: ${start}   Stop: ${stop}`);
+
+      // Work performed
+      const notes = cr.querySelector("textarea").value.trim();
+      if (notes) out.push(notes);
+
+      // Rentals
+      const rentalLines = [];
+      cr.querySelectorAll(".rentals .line-row").forEach(row => {
+        const vals = [...row.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
+        if (vals.length) rentalLines.push(`• ${vals.join(" – ")}`);
+      });
+      if (rentalLines.length) { out.push("", "Rentals:"); out.push(...rentalLines); }
+
+      // Materials
+      const materialLines = [];
+      cr.querySelectorAll(".materials .line-row").forEach(row => {
+        const vals = [...row.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
+        if (vals.length) materialLines.push(`• ${vals.join(" – ")}`);
+      });
+      if (materialLines.length) { out.push("", "Materials:"); out.push(...materialLines); }
+
+      out.push(""); // spacer between crews
     });
+
+    out.push(""); // spacer between days
   });
 
   navigator.clipboard.writeText(out.join("\n").trim());
   alert("Copied to clipboard.");
 };
 
-/* ===== HELP ===== */
-const helpOverlay=document.getElementById("helpOverlay");
-helpBtn.onclick=()=>helpOverlay.style.display="block";
-helpClose.onclick=()=>helpOverlay.style.display="none";
-helpOverlay.onclick=e=>{if(e.target===helpOverlay)helpOverlay.style.display="none";};
+/* =================== Help Pane =================== */
+const helpOverlay = document.getElementById("helpOverlay");
+document.getElementById("helpBtn").onclick   = () => helpOverlay.style.display = "block";
+document.getElementById("helpClose").onclick = () => helpOverlay.style.display = "none";
+helpOverlay.onclick = (e) => { if (e.target === helpOverlay) helpOverlay.style.display = "none"; };
 
-/* ===== INIT ===== */
-document.addEventListener("DOMContentLoaded",()=>{
-  seedCustomers();
+/* =================== Init & Button Wiring =================== */
+document.addEventListener("DOMContentLoaded", () => {
+  // Seed & load customer smart-fill, add first day
+  seedCustomersOnce();
   loadCustomerList();
   addDay(today());
+
+  // Next Day — attach after DOM is present
+  document.getElementById("nextDay").onclick = () => {
+    const lastDateInput = document.querySelector('#days .card:last-child input[type="date"]');
+    const lastDateStr = lastDateInput ? lastDateInput.value : today();
+    const d = new Date(lastDateStr + "T00:00");
+    d.setDate(d.getDate() + 1);
+    addDay(d.toISOString().split("T")[0]);
+  };
+
+  // Clear All
+  document.getElementById("clearAll").onclick = () => {
+    if (confirm("Clear all entries?")) {
+      document.getElementById("days").innerHTML = "";
+      addDay(today());
+    }
+  };
 });
-customer.oninput=e=>e.target.value=e.target.value.toUpperCase();
-customer.onblur=e=>{ saveCustomer(e.target.value); loadCustomerList(); };
-location.oninput=e=>e.target.value=e.target.value.toUpperCase();
+
+// Uppercase while typing for Customer & Lease/Location; save customer on blur
+const customerInput = document.getElementById("customer");
+const locationInput = document.getElementById("location");
+
+customerInput.oninput = e => e.target.value = e.target.value.toUpperCase();
+customerInput.onblur  = e => { saveCustomer(e.target.value); loadCustomerList(); };
+locationInput.oninput = e => e.target.value = e.target.value.toUpperCase();
 </script>
 </body>
 </html>
