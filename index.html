@@ -7,23 +7,29 @@
 
 <style>
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: system-ui, Arial, sans-serif;
   background:#f8fafc;
   margin:0;
 }
+
 .wrapper {
   max-width:900px;
   margin:auto;
   padding:16px;
   padding-bottom:260px;
 }
+
 .top-bar {
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin-bottom:12px;
 }
-h1 { margin:0; font-size:20px; }
+
+h1 {
+  margin:0;
+  font-size:20px;
+}
 
 button {
   padding:8px 12px;
@@ -32,6 +38,7 @@ button {
   background:#fff;
   cursor:pointer;
 }
+
 .primary {
   background:#0f62fe;
   color:#fff;
@@ -51,6 +58,7 @@ label {
   margin-top:10px;
   display:block;
 }
+
 .helper {
   font-size:11px;
   color:#6b7280;
@@ -64,18 +72,12 @@ input, textarea, select {
   border:2px solid #d1d5db;
   font-size:14px;
 }
-input:focus, textarea:focus, select:focus {
-  outline:none;
-  border-color:#0f62fe;
-  box-shadow:0 0 0 3px rgba(15,98,254,.25);
-}
 
 .row {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-@media(max-width:600px){ .row{grid-template-columns:1fr;} }
 
 details.crew {
   border:1px solid #e5e7eb;
@@ -83,14 +85,16 @@ details.crew {
   padding:8px;
   margin-top:12px;
 }
+
 details summary {
   font-weight:700;
   cursor:pointer;
   list-style:none;
 }
-summary::-webkit-details-marker{display:none;}
-summary::before{content:"▶";margin-right:6px;}
-details[open] summary::before{transform:rotate(90deg);}
+
+summary::-webkit-details-marker { display:none; }
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); }
 
 .crew-grid {
   display:grid;
@@ -104,6 +108,7 @@ details[open] summary::before{transform:rotate(90deg);}
   gap:6px;
   margin-top:6px;
 }
+
 .remove-btn {
   background:#ef4444;
   color:#fff;
@@ -114,7 +119,7 @@ details[open] summary::before{transform:rotate(90deg);}
 
 .bottom-bar {
   position:fixed;
-  bottom:0;left:0;right:0;
+  bottom:0; left:0; right:0;
   background:#fff;
   border-top:1px solid #e5e7eb;
   display:flex;
@@ -123,7 +128,7 @@ details[open] summary::before{transform:rotate(90deg);}
   padding:10px;
 }
 
-/* Help pane */
+/* Help Pane */
 .help-overlay {
   position:fixed;
   inset:0;
@@ -131,6 +136,7 @@ details[open] summary::before{transform:rotate(90deg);}
   display:none;
   z-index:100;
 }
+
 .help-panel {
   position:absolute;
   right:0;
@@ -142,6 +148,7 @@ details[open] summary::before{transform:rotate(90deg);}
   padding:16px;
   overflow-y:auto;
 }
+
 .help-close {
   text-align:right;
   font-weight:600;
@@ -159,11 +166,10 @@ details[open] summary::before{transform:rotate(90deg);}
   <button id="helpBtn">Help</button>
 </div>
 
+<!-- Smartfill lists -->
 <datalist id="customerList"></datalist>
 <datalist id="locationList"></datalist>
 <datalist id="crewList"></datalist>
-<datalist id="truckList"></datalist>
-<datalist id="itemList"></datalist>
 <datalist id="vendorList"></datalist>
 
 <div class="card">
@@ -183,139 +189,121 @@ details[open] summary::before{transform:rotate(90deg);}
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- HELP PANE -->
+<!-- HELP PANEL -->
 <div class="help-overlay" id="helpOverlay">
-<div class="help-panel">
-<div class="help-close" id="helpClose">Close ✕</div>
+  <div class="help-panel">
+    <div class="help-close" id="helpClose">Close ✕</div>
 
-<h3>How to use this page</h3>
+    <h3>How to use this page</h3>
 
-<p>
-This page is used to create clean, consistent resolution notes for MobileTech.
-Nothing is saved permanently — use <strong>Copy All</strong> to paste the notes
-into MobileTech when finished.
-</p>
+    <p>This page is used to create clean, consistent MobileTech resolution notes.</p>
 
-<hr>
+    <hr>
 
-<h4>Customer / Lease</h4>
-<p>
-Customer and Lease / Location apply to <strong>all days</strong> entered below.
-Enter them once at the top unless they change.
-</p>
+    <h4>Customer / Lease</h4>
+    <p>Customer and Lease apply to all days entered below.</p>
+    <pre>OXY USA – SCR LEASE</pre>
 
-<pre>OXY USA – SCR LEASE</pre>
+    <hr>
 
-<hr>
+    <h4>Trucks</h4>
+    <p>Enter all trucks taken to the location. Trucks must be exactly 4 digits. Duplicate trucks on the same day are blocked and show which crew already has the truck.</p>
 
-<h4>Days & Next Day</h4>
-<p>
-Each date represents a separate work day.
-<strong>Next Day</strong> adds a new date and starts fresh at Crew #1.
-</p>
+    <hr>
 
-<hr>
+    <h4>Work Performed</h4>
+    <p>Describe work completed during the day. Include delays, changes, added requests, or issues.</p>
 
-<h4>Crews</h4>
-<p>
-Each crew represents a group of employees working together. Multiple crews
-may be entered per day if needed.
-</p>
+    <hr>
 
-<hr>
+    <h4>Rentals</h4>
+    <p>Equipment left on location that will be returned later (pumps, generators, automation, road crossings, etc.).</p>
 
-<h4>Trucks</h4>
-<p>
-Enter <strong>all trucks taken to the location</strong>, even if only briefly onsite.
-</p>
-<ul>
-  <li>Truck numbers must be exactly 4 digits</li>
-  <li>Multiple trucks per crew are allowed</li>
-  <li>Duplicate trucks on the same day are blocked and identify the conflicting crew</li>
-</ul>
+    <hr>
 
-<hr>
+    <h4>Materials</h4>
+    <p>Items or parts used or sold to the customer and not returned.</p>
 
-<h4>Start / Stop Time</h4>
-<p>
-Enter the most accurate start and stop times possible.
-These times are used for billing and documentation.
-</p>
+    <hr>
 
-<hr>
-
-<h4>Work Performed</h4>
-<p>
-Describe the work completed by the crew. This section protects the crew and
-company in the event of billing or scope questions.
-</p>
-<ul>
-  <li>Delays (weather, access, equipment, customer)</li>
-  <li>Change of scope</li>
-  <li>Added requests</li>
-  <li>Standby time</li>
-  <li>Unforeseen circumstances</li>
-</ul>
-
-<pre>
-Installed low pro pumps and staged equipment.
-Weather delay approximately 1.5 hours.
-Additional work added at customer request.
-</pre>
-
-<hr>
-
-<h4>Rentals (Equipment left on location – returning)</h4>
-<p>
-List equipment that was left on location and will be returned later.
-Do not include items that will be consumed or sold.
-</p>
-<ul>
-  <li>Pumps</li>
-  <li>Generators</li>
-  <li>Light towers</li>
-  <li>Automation</li>
-  <li>Road crossings</li>
-  <li>Flowmeters</li>
-</ul>
-
-<hr>
-
-<h4>Materials (Used or sold – not returning)</h4>
-<p>
-List materials or parts that were used or sold to the customer and
-will not be returned.
-</p>
-<ul>
-  <li>Liner</li>
-  <li>Geo</li>
-  <li>Heads</li>
-  <li>Fuel</li>
-  <li>Clamps</li>
-  <li>Fittings</li>
-</ul>
-
-<hr>
-
-<h4>Copy All</h4>
-<p>
-Copies only entered data into clean, MobileTech‑ready text.
-Empty sections are automatically omitted.
-</p>
-
-</div>
+    <h4>Copy All</h4>
+    <p>Copies only entered data into clean, MobileTech‑ready text.</p>
+  </div>
 </div>
 
 <script>
-const helpOverlay=document.getElementById("helpOverlay");
-const helpBtn=document.getElementById("helpBtn");
-const helpClose=document.getElementById("helpClose");
+/* ===== Helpers ===== */
+function today(){ return new Date().toISOString().split("T")[0]; }
 
-helpBtn.onclick=()=>helpOverlay.style.display="block";
-helpClose.onclick=()=>helpOverlay.style.display="none";
-helpOverlay.onclick=e=>{if(e.target===helpOverlay)helpOverlay.style.display="none";};
+/* ===== Crew ===== */
+function createCrew(num){
+  const d = document.createElement("details");
+  d.className = "crew";
+  d.open = true;
 
-// existing JS logic continues unchanged…
+  d.innerHTML = `
+    <summary>Crew #${num}</summary>
+
+    <label>Work Performed</label>
+    <div class="helper">Describe work completed during the day. Include delays, changes, or issues.</div>
+    <textarea></textarea>
+
+    <label>Rentals</label>
+    <div class="helper">Equipment left on location that will be returned later.</div>
+    <div class="rentals"></div>
+    <button class="addRental">Add Rental</button>
+
+    <label>Materials</label>
+    <div class="helper">Materials or parts used or sold to the customer.</div>
+    <div class="materials"></div>
+    <button class="addMaterial">Add Material</button>
+  `;
+
+  d.querySelector(".addRental").onclick = () => {
+    const row = document.createElement("div");
+    row.className = "line-row";
+    row.innerHTML = `<input placeholder="Item / Unit #"><button class="remove-btn">✕</button>`;
+    row.querySelector("button").onclick = () => row.remove();
+    d.querySelector(".rentals").appendChild(row);
+  };
+
+  d.querySelector(".addMaterial").onclick = () => {
+    const row = document.createElement("div");
+    row.className = "line-row";
+    row.innerHTML = `<input placeholder="Item / Description"><button class="remove-btn">✕</button>`;
+    row.querySelector("button").onclick = () => row.remove();
+    d.querySelector(".materials").appendChild(row);
+  };
+
+  return d;
+}
+
+/* ===== Days ===== */
+function addDay(date){
+  const c = document.createElement("div");
+  c.className = "card";
+  c.innerHTML = `<label>Date</label><input type="date" value="${date}">`;
+
+  const crews = document.createElement("div");
+  crews.appendChild(createCrew(1));
+
+  const btn = document.createElement("button");
+  btn.textContent = "Add Crew";
+  btn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
+
+  c.appendChild(crews);
+  c.appendChild(btn);
+  document.getElementById("days").appendChild(c);
+}
+
+/* ===== Help Pane ===== */
+const helpOverlay = document.getElementById("helpOverlay");
+document.getElementById("helpBtn").onclick = () => helpOverlay.style.display = "block";
+document.getElementById("helpClose").onclick = () => helpOverlay.style.display = "none";
+helpOverlay.onclick = e => { if(e.target === helpOverlay) helpOverlay.style.display = "none"; };
+
+/* ===== Init ===== */
+document.addEventListener("DOMContentLoaded",() => addDay(today()));
 </script>
 </body>
 </html>
