@@ -1,4 +1,7 @@
-<!-- Template V1.1-dev (Sandbox) -->
+<!-- Template V1.1-dev (Sandbox)
+     Base: Template V1.0 (frozen)
+     Changes: instructions, help pane, Copy All, duplicate truck rule, customer smartfill -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +10,8 @@
 <title>MobileTech Resolution Notes</title>
 
 <style>
-/* ================= BASE ================= */
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: system-ui, Arial, sans-serif;
   background:#f8fafc;
   margin:0;
 }
@@ -25,10 +27,8 @@ body {
   align-items:center;
   margin-bottom:12px;
 }
-h1 {
-  margin:0;
-  font-size:20px;
-}
+h1 { margin:0; font-size:20px; }
+
 button {
   padding:8px 12px;
   border-radius:6px;
@@ -36,12 +36,8 @@ button {
   background:#fff;
   cursor:pointer;
 }
-.primary {
-  background:#0f62fe;
-  color:#fff;
-}
+.primary { background:#0f62fe; color:#fff; }
 
-/* ================= CARD / INPUT ================= */
 .card {
   background:#fff;
   border:1px solid #e5e7eb;
@@ -49,34 +45,32 @@ button {
   padding:12px;
   margin-bottom:16px;
 }
+
 label {
   font-size:12px;
   font-weight:600;
   margin-top:10px;
   display:block;
 }
+.helper {
+  font-size:11px;
+  color:#6b7280;
+  margin-bottom:4px;
+}
+
 input, textarea, select {
   width:100%;
   padding:10px;
   border-radius:6px;
   border:2px solid #d1d5db;
-  font-size:14px;
 }
-input:focus, textarea:focus, select:focus {
-  outline:none;
-  border-color:#0f62fe;
-  box-shadow:0 0 0 3px rgba(15,98,254,.25);
-}
+
 .row {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-@media(max-width:600px) {
-  .row { grid-template-columns:1fr; }
-}
 
-/* ================= CREW COLLAPSE ================= */
 details.crew {
   border:1px solid #e5e7eb;
   border-radius:8px;
@@ -89,26 +83,19 @@ details summary {
   list-style:none;
 }
 summary::-webkit-details-marker { display:none; }
-summary::before {
-  content:"▶";
-  margin-right:6px;
-}
-details[open] summary::before {
-  transform:rotate(90deg);
-  display:inline-block;
-}
+summary::before { content:"▶"; margin-right:6px; }
+details[open] summary::before { transform:rotate(90deg); }
+
 .crew-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:8px;
 }
 
-/* ================= LINE ROWS ================= */
 .line-row {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px;
   gap:6px;
-  align-items:center;
   margin-top:6px;
 }
 .remove-btn {
@@ -119,38 +106,9 @@ details[open] summary::before {
   cursor:pointer;
 }
 
-/* ================= HELP PANEL ================= */
-.help-overlay {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.35);
-  display:none;
-  z-index:100;
-}
-.help-panel {
-  position:absolute;
-  right:0;
-  top:0;
-  width:420px;
-  max-width:100%;
-  height:100%;
-  background:#fff;
-  padding:16px;
-  overflow-y:auto;
-}
-.help-close {
-  text-align:right;
-  font-weight:600;
-  color:#0f62fe;
-  cursor:pointer;
-}
-
-/* ================= BOTTOM BAR ================= */
 .bottom-bar {
   position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+  bottom:0;left:0;right:0;
   background:#fff;
   border-top:1px solid #e5e7eb;
   display:flex;
@@ -158,6 +116,11 @@ details[open] summary::before {
   gap:8px;
   padding:10px;
 }
+
+/* Help pane */
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:100}
+.help-panel{position:absolute;right:0;top:0;width:420px;height:100%;background:#fff;padding:16px;overflow-y:auto}
+.help-close{text-align:right;font-weight:600;color:#0f62fe;cursor:pointer}
 </style>
 </head>
 
@@ -169,21 +132,14 @@ details[open] summary::before {
   <button id="helpBtn">Help</button>
 </div>
 
-<!-- ============== SMARTFILL DATA LISTS ============== -->
+<!-- SMARTFILL -->
 <datalist id="customerList"></datalist>
-<datalist id="locationList"></datalist>
-<datalist id="crewList"></datalist>
-<datalist id="truckList"></datalist>
-<datalist id="itemList"></datalist>
-<datalist id="vendorList"></datalist>
 
-<!-- ============== JOB HEADER ============== -->
 <div class="card">
   <label>Customer</label>
   <input id="customer" list="customerList">
-
   <label>Lease / Location</label>
-  <input id="location" list="locationList">
+  <input id="location">
 </div>
 
 <div id="days"></div>
@@ -195,278 +151,240 @@ details[open] summary::before {
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- ============== HELP PANEL ============== -->
+<!-- HELP PANE -->
 <div class="help-overlay" id="helpOverlay">
 <div class="help-panel">
 <div class="help-close" id="helpClose">Close ✕</div>
 
 <h3>How to use this page</h3>
-
-<p><strong>Customer / Lease</strong> are optional and apply to all days.</p>
-
-<p><strong>Next Day</strong> adds a new date and resets to Crew #1.</p>
-
-<p><strong>Crews</strong> can be expanded or collapsed.</p>
+<p>This tool creates clean MobileTech resolution notes. Use Copy All to paste when finished.</p>
 
 <h4>Trucks</h4>
-<ul>
-<li>Exactly 4 digits</li>
-<li>Multiple trucks per crew</li>
-<li>Remove individually</li>
-<li>Warning if reused on same day</li>
-</ul>
+<p>Enter all trucks taken to the location for the day. Truck numbers must be exactly 4 digits.  
+Duplicate trucks on the same day are blocked and show which crew already has the truck.</p>
 
-<h4>Rentals & Materials</h4>
-<p>Each line includes:</p>
-<ul>
-<li>Item</li>
-<li>Details</li>
-<li>Qty / Distance</li>
-<li>Vendor</li>
-<li>PO</li>
-</ul>
+<h4>Start / Stop Time</h4>
+<p>Enter accurate start and stop times. These are used for billing and documentation.</p>
 
-<h4>Example Output</h4>
-<pre>
-OXY USA – SCR Lease
+<h4>Work Performed</h4>
+<p>Describe work completed during the day. Include delays, changes, added requests, or issues.</p>
 
-03/18/26
-Crew #1
-Trucks: 2145, 3057
-John, Mike
-Start: 0700   Stop: 1530
-Installed low pro pumps.
+<h4>Rentals</h4>
+<p>Equipment left on location that will be returned later (pumps, generators, automation, etc.).</p>
 
-Low Pro – 600 HP – Qty 1 – Big D Pump – PO 12345
-</pre>
+<h4>Materials</h4>
+<p>Items or parts used or sold to the customer and not returned (liner, fuel, clamps, etc.).</p>
+
+<h4>Copy All</h4>
+<p>Copies only entered fields into clean MobileTech‑ready text.</p>
 </div>
 </div>
 
 <script>
-/* =====================================================
-   UTILITIES & SMARTFILL
-===================================================== */
-function getStore(key) {
-  return JSON.parse(localStorage.getItem(key) || "[]");
+/* ===== UTILITIES ===== */
+function today(){ return new Date().toISOString().split("T")[0]; }
+
+/* ===== CUSTOMER SMARTFILL ===== */
+function getCustomers(){ return JSON.parse(localStorage.getItem("customers") || "[]"); }
+function saveCustomer(v){
+  if(!v) return;
+  const arr=getCustomers();
+  if(!arr.includes(v)){ arr.push(v); localStorage.setItem("customers",JSON.stringify(arr)); }
 }
-function addStore(key, value) {
-  if (!value) return;
-  const arr = getStore(key);
-  if (!arr.includes(value)) {
-    arr.push(value);
-    localStorage.setItem(key, JSON.stringify(arr));
-  }
-}
-function loadStore(key, listId) {
-  const dl = document.getElementById(listId);
-  dl.innerHTML = "";
-  getStore(key).forEach(v => {
-    const o = document.createElement("option");
-    o.value = v;
+function loadCustomerList(){
+  const dl=document.getElementById("customerList");
+  dl.innerHTML="";
+  getCustomers().forEach(c=>{
+    const o=document.createElement("option");
+    o.value=c;
     dl.appendChild(o);
   });
 }
 
-/* =====================================================
-   CREW LOGIC
-===================================================== */
-function updateCrewMembers(selectEl) {
-  const grid = selectEl.closest("details").querySelector(".crew-grid");
-  grid.innerHTML = "";
-  for (let i = 0; i < selectEl.value; i++) {
-    const inp = document.createElement("input");
-    inp.placeholder = `Crew Member ${i + 1}`;
-    inp.setAttribute("list", "crewList");
-    inp.addEventListener("blur", () => addStore("crew", inp.value));
+/* ===== DUPLICATE TRUCK RULE ===== */
+function blockDuplicateTruck(input){
+  const val=input.value;
+  if(!/^\d{4}$/.test(val)) return;
+  const day=input.closest(".card");
+  const crewName=input.closest("details").querySelector("summary").textContent;
+  day.querySelectorAll(".trucks input").forEach(t=>{
+    if(t!==input && t.value===val){
+      alert(`Truck #${val} is already on ${crewName} for this day.`);
+      input.value="";
+      input.focus();
+    }
+  });
+}
+
+/* ===== CREW MEMBERS ===== */
+function updateCrewMembers(sel){
+  const grid=sel.closest("details").querySelector(".crew-grid");
+  grid.innerHTML="";
+  for(let i=0;i<sel.value;i++){
+    const inp=document.createElement("input");
+    inp.placeholder=`Crew Member ${i+1}`;
     grid.appendChild(inp);
   }
 }
 
-function addLineRow(container, isTruck) {
-  const row = document.createElement("div");
-  row.className = "line-row";
-
-  if (isTruck) {
-    const inp = document.createElement("input");
-    inp.placeholder = "0000";
-    inp.maxLength = 4;
-    inp.inputMode = "numeric";
-    inp.setAttribute("list", "truckList");
-    inp.addEventListener("input", () => {
-      inp.value = inp.value.replace(/\D/g, "").slice(0, 4);
-    });
-    inp.addEventListener("blur", () => {
-      if (/^\d{4}$/.test(inp.value)) {
-        addStore("trucks", inp.value);
-      } else if (inp.value) {
-        alert("Truck # must be exactly 4 digits");
-        inp.value = "";
-      }
-    });
+/* ===== ROW ADDERS ===== */
+function addRow(container, placeholders){
+  const row=document.createElement("div");
+  row.className="line-row";
+  placeholders.forEach(ph=>{
+    const inp=document.createElement("input");
+    inp.placeholder=ph;
     row.appendChild(inp);
-  } else {
-    ["Item", "Details", "Qty / Distance", "Vendor", "PO"].forEach(ph => {
-      const inp = document.createElement("input");
-      inp.placeholder = ph;
-      if (ph === "Item") {
-        inp.setAttribute("list", "itemList");
-        inp.addEventListener("blur", () => addStore("items", inp.value));
-      }
-      if (ph === "Vendor") {
-        inp.setAttribute("list", "vendorList");
-        inp.addEventListener("blur", () => addStore("vendors", inp.value));
-      }
-      row.appendChild(inp);
-    });
-  }
-
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "✕";
-  removeBtn.className = "remove-btn";
-  removeBtn.onclick = () => row.remove();
-
-  row.appendChild(removeBtn);
+  });
+  const rm=document.createElement("button");
+  rm.textContent="✕";
+  rm.className="remove-btn";
+  rm.onclick=()=>row.remove();
+  row.appendChild(rm);
   container.appendChild(row);
 }
 
-function createCrew(crewNum) {
-  const d = document.createElement("details");
-  d.className = "crew";
-  d.open = true;
+/* ===== CREATE CREW ===== */
+function createCrew(num){
+  const d=document.createElement("details");
+  d.className="crew"; d.open=true;
 
-  d.innerHTML = `
-    <summary>Crew #${crewNum}</summary>
+  d.innerHTML=`
+    <summary>Crew #${num}</summary>
 
     <label>Trucks</label>
+    <div class="helper">All trucks taken to the location for this crew.</div>
     <div class="trucks"></div>
     <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
     <select>
-      <option value="1">1-Man Crew</option>
-      <option value="2">2-Man Crew</option>
-      <option value="3">3-Man Crew</option>
-      <option value="4">4-Man Crew</option>
-      <option value="5">5-Man Crew</option>
+      <option value="1">1‑Man Crew</option>
+      <option value="2">2‑Man Crew</option>
+      <option value="3">3‑Man Crew</option>
+      <option value="4">4‑Man Crew</option>
+      <option value="5">5‑Man Crew</option>
     </select>
 
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
-    <label>Start / Stop</label>
-    <div class="row">
-      <input type="time">
-      <input type="time">
-    </div>
+    <label>Start / Stop Time</label>
+    <div class="helper">Enter actual start and stop times.</div>
+    <div class="row"><input type="time"><input type="time"></div>
 
-    <label>Work performed</label>
+    <label>Work Performed</label>
+    <div class="helper">Describe work completed during the day. Include delays, changes, or issues.</div>
     <textarea></textarea>
 
-    <label>Rental</label>
+    <label>Rentals</label>
+    <div class="helper">Equipment left on location that will be returned later.</div>
     <div class="rentals"></div>
     <button class="addRental">Add Rental</button>
 
-    <label>Material</label>
+    <label>Materials</label>
+    <div class="helper">Materials or parts used or sold to the customer.</div>
     <div class="materials"></div>
     <button class="addMaterial">Add Material</button>
 
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  const select = d.querySelector("select");
-  select.addEventListener("change", () => updateCrewMembers(select));
-  updateCrewMembers(select);
+  const sel=d.querySelector("select");
+  sel.onchange=()=>updateCrewMembers(sel);
+  updateCrewMembers(sel);
 
-  d.querySelector(".addTruck").onclick = () =>
-    addLineRow(d.querySelector(".trucks"), true);
-
-  d.querySelector(".addRental").onclick = () =>
-    addLineRow(d.querySelector(".rentals"), false);
-
-  d.querySelector(".addMaterial").onclick = () =>
-    addLineRow(d.querySelector(".materials"), false);
-
-  d.querySelector(".removeCrew").onclick = () => {
-    const parent = d.parentElement;
-    d.remove();
-    [...parent.querySelectorAll("details")].forEach((c, i) => {
-      c.querySelector("summary").textContent = `Crew #${i + 1}`;
-    });
+  d.querySelector(".addTruck").onclick=()=>{
+    const t=document.createElement("input");
+    t.placeholder="0000";
+    t.maxLength=4;
+    t.inputMode="numeric";
+    t.oninput=()=>t.value=t.value.replace(/\D/g,"").slice(0,4);
+    t.onblur=()=>blockDuplicateTruck(t);
+    d.querySelector(".trucks").appendChild(t);
   };
 
+  d.querySelector(".addRental").onclick=()=>{
+    addRow(d.querySelector(".rentals"),
+      ["Item / Unit #","Details","Qty / Distance","Vendor","PO"]);
+  };
+
+  d.querySelector(".addMaterial").onclick=()=>{
+    addRow(d.querySelector(".materials"),
+      ["Item / Description","Details","Qty","Vendor","PO"]);
+  };
+
+  d.querySelector(".removeCrew").onclick=()=>d.remove();
   return d;
 }
 
-/* =====================================================
-   DAYS
-===================================================== */
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-function addDay(dateValue) {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<label>Date</label><input type="date" value="${dateValue}">`;
-
-  const crews = document.createElement("div");
+/* ===== DAY ===== */
+function addDay(date){
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML=`<label>Date</label><input type="date" value="${date}">`;
+  const crews=document.createElement("div");
   crews.appendChild(createCrew(1));
-
-  const btn = document.createElement("button");
-  btn.textContent = "Add Crew";
-  btn.onclick = () => crews.appendChild(createCrew(crews.children.length + 1));
-
-  card.appendChild(crews);
-  card.appendChild(btn);
-  document.getElementById("days").appendChild(card);
+  const b=document.createElement("button");
+  b.textContent="Add Crew";
+  b.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
+  c.appendChild(crews);
+  c.appendChild(b);
+  document.getElementById("days").appendChild(c);
 }
 
-/* =====================================================
-   INIT & EVENTS
-===================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  loadStore("customers", "customerList");
-  loadStore("locations", "locationList");
-  loadStore("crew", "crewList");
-  loadStore("trucks", "truckList");
-  loadStore("items", "itemList");
-  loadStore("vendors", "vendorList");
+/* ===== COPY ALL ===== */
+copyAll.onclick=()=>{
+  let out=[];
+  if(customer.value||location.value){
+    out.push([customer.value,location.value].filter(Boolean).join(" – "));
+    out.push("");
+  }
 
-  document.getElementById("customer").addEventListener("blur", e =>
-    addStore("customers", e.target.value)
-  );
-  document.getElementById("location").addEventListener("blur", e =>
-    addStore("locations", e.target.value)
-  );
+  document.querySelectorAll("#days .card").forEach(day=>{
+    out.push(day.querySelector("input[type=date]").value);
+    day.querySelectorAll("details.crew").forEach(cr=>{
+      out.push(cr.querySelector("summary").textContent);
+      const notes=cr.querySelector("textarea").value.trim();
+      if(notes) out.push(notes);
+      out.push("");
+    });
+  });
 
-  addDay(today());
-});
+  navigator.clipboard.writeText(out.join("\n").trim());
+  alert("Copied to clipboard.");
+};
 
-document.getElementById("nextDay").onclick = () => {
-  const lastDate =
-    document.querySelector("#days .card:last-child input").value;
-  const d = new Date(lastDate + "T00:00");
-  d.setDate(d.getDate() + 1);
+/* ===== BOTTOM BAR ===== */
+nextDay.onclick=()=>{
+  const last=document.querySelector("#days .card:last-child input").value;
+  const d=new Date(last+"T00");
+  d.setDate(d.getDate()+1);
   addDay(d.toISOString().split("T")[0]);
 };
 
-document.getElementById("clearAll").onclick = () => {
-  if (confirm("Clear all entries?")) {
-    document.getElementById("days").innerHTML = "";
+clearAll.onclick=()=>{
+  if(confirm("Clear all entries?")){
+    days.innerHTML="";
     addDay(today());
   }
 };
 
-document.getElementById("helpBtn").onclick =
-  () => (helpOverlay.style.display = "block");
-document.getElementById("helpClose").onclick =
-  () => (helpOverlay.style.display = "none");
-helpOverlay.onclick = e => {
-  if (e.target === helpOverlay) helpOverlay.style.display = "none";
-};
+/* ===== HELP ===== */
+const helpOverlay=document.getElementById("helpOverlay");
+helpBtn.onclick=()=>helpOverlay.style.display="block";
+helpClose.onclick=()=>helpOverlay.style.display="none";
+helpOverlay.onclick=e=>{if(e.target===helpOverlay)helpOverlay.style.display="none";};
 
-document.getElementById("copyAll").onclick = () => {
-  alert("Copy All formatting can now be finalized.");
-};
+/* ===== INIT ===== */
+document.addEventListener("DOMContentLoaded",()=>{
+  addDay(today());
+  loadCustomerList();
+});
+
+customer.oninput=e=>e.target.value=e.target.value.toUpperCase();
+customer.onblur=e=>{ saveCustomer(e.target.value); loadCustomerList(); };
+location.oninput=e=>e.target.value=e.target.value.toUpperCase();
 </script>
 </body>
 </html>
