@@ -1,10 +1,10 @@
 <!-- Template V1.2-dev (Sandbox)
      Base: Template V1.1-dev confirmed good
      Additions/Fixes in this file:
-       • Truck section fully restored + helper text
+       • Truck section: each truck has its own ✕ delete button (line-row)
        • 4-digit truck enforcement + same-day duplicate hard-block with crew name
-       • Copy All includes Trucks, Crew Members, Times, Work, Rentals, Materials
-       • Next Day reliably adds new date + fresh Crew #1
+       • Copy All includes Trucks, Crew Members, Times, Work, Rentals, Materials (skips empty)
+       • Next Day reliably adds new date + fresh Crew #1 (Customer/Lease remain at top)
        • On-page helper instructions for all sections
        • Crew size labels '1‑MAN', '2‑MAN', '3‑MAN', ...
        • Customer smart-fill (static + learning) and ALL CAPS
@@ -49,7 +49,7 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 
 .crew-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; }
 
-/* ---- Repeating line rows (rentals/materials) ---- */
+/* ---- Repeating line rows (trucks/rentals/materials) ---- */
 .line-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px; gap:6px; margin-top:6px; align-items:center; }
 .remove-btn { background:#ef4444; color:#fff; border:none; border-radius:4px; cursor:pointer; }
 
@@ -187,7 +187,6 @@ function loadCustomerList() {
 }
 
 /* =================== Truck Rules =================== */
-/* Enforce numeric-only, exactly 4 digits on input; block same-day duplicates identifying other crew */
 function enforceTruckFormat(input) {
   input.value = input.value.replace(/\D/g,"").slice(0,4);
 }
@@ -196,8 +195,6 @@ function blockDuplicateTruck(input) {
   if (!/^\d{4}$/.test(val)) return;
 
   const dayCard = input.closest(".card");
-  const thisCrew = input.closest("details").querySelector("summary").textContent;
-
   const allTruckInputs = dayCard.querySelectorAll(".trucks input");
   for (const other of allTruckInputs) {
     if (other === input) continue;
@@ -294,8 +291,11 @@ function createCrew(num) {
   sel.onchange = () => updateCrewMembers(sel);
   updateCrewMembers(sel);
 
-  // Add Truck button
+  // Add Truck → now creates a row with input + ✕ remove
   d.querySelector(".addTruck").onclick = () => {
+    const row = document.createElement("div");
+    row.className = "line-row";
+
     const t = document.createElement("input");
     t.placeholder = "0000";
     t.maxLength = 4;
@@ -309,7 +309,15 @@ function createCrew(num) {
       }
       blockDuplicateTruck(t);
     };
-    d.querySelector(".trucks").appendChild(t);
+
+    const rm = document.createElement("button");
+    rm.className = "remove-btn";
+    rm.textContent = "✕";
+    rm.onclick = () => row.remove();
+
+    row.appendChild(t);
+    row.appendChild(rm);
+    d.querySelector(".trucks").appendChild(row);
   };
 
   // Rentals / Materials adders
@@ -319,11 +327,10 @@ function createCrew(num) {
   d.querySelector(".addMaterial").onclick = () =>
     addRow(d.querySelector(".materials"), ["Item / Description","Details","Qty","Vendor","PO"]);
 
-  // Delete Crew with renumbering
+  // Delete Crew with renumbering (within this day)
   d.querySelector(".removeCrew").onclick = () => {
-    const dayContainer = d.parentElement; // the wrapper that holds crews
+    const dayContainer = d.parentElement;
     d.remove();
-    // Renumber remaining crews inside this day only
     [...dayContainer.querySelectorAll("details.crew")].forEach((crewEl, idx) => {
       const sm = crewEl.querySelector("summary");
       if (sm) sm.textContent = `Crew #${idx+1}`;
