@@ -1,13 +1,15 @@
-<!-- Template V1.3.1-dev (Sandbox)
-     Base: Template V1.3-dev
+<!-- Template V1.3.2-dev (Sandbox)
      Fixes:
-       • Header copies CUSTOMER – LEASE/LOCATION in ALL CAPS
-       • Date read from input[type="date"] (no NaN)
-       • Rentals/Materials copied per row (bullets keep structure)
-       • Crew member smart-fill (ALL CAPS) + duplicate-per-day block
+       • Trucks section restored (✕ delete per truck, 4-digit, duplicate-per-day hard-block)
+       • Require at least one truck per crew (Copy All validation)
+       • Lease / Location smart-fill (ALL CAPS + learning)
+     Keeps:
+       • Header (CUSTOMER – LEASE) in ALL CAPS
+       • Date MM/DD/YY, AM/PM times, crew size in header
+       • Crew member smart-fill (ALL CAPS) + duplicate-per-day rule
        • Rentals/Materials DESCRIPTION smart-fill (seeded + learning)
-       • DEV visual distinction (light-blue background + badge)
-       • All prior working features preserved
+       • Row-based bullets for Rentals/Materials in Copy All
+       • DEV background + badge, Next Day, Delete Day, Clear All
 -->
 
 <!DOCTYPE html>
@@ -19,7 +21,7 @@
 
 <style>
 /* ---- Base Layout ---- */
-body { font-family: system-ui, Arial, sans-serif; background:#eef6ff; /* DEV background */ margin:0; }
+body { font-family: system-ui, Arial, sans-serif; background:#eef6ff; /* DEV bg */ margin:0; }
 .wrapper { max-width:900px; margin:auto; padding:16px; padding-bottom:240px; }
 
 .top-bar { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; }
@@ -73,6 +75,7 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 
   <!-- Smart-fill lists -->
   <datalist id="customerList"></datalist>
+  <datalist id="locationList"></datalist>
   <datalist id="crewMemberList"></datalist>
   <datalist id="rentalDescList"></datalist>
   <datalist id="materialDescList"></datalist>
@@ -82,7 +85,7 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
     <input id="customer" list="customerList" />
 
     <label>Lease / Location</label>
-    <input id="location" />
+    <input id="location" list="locationList" />
   </div>
 
   <div id="days"></div>
@@ -94,25 +97,22 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- Help Pane (kept concise here; content unchanged from prior) -->
+<!-- Help Pane (kept concise) -->
 <div class="help-overlay" id="helpOverlay">
   <div class="help-panel">
     <div class="help-close" id="helpClose">Close ✕</div>
     <h3>How to Use This Page</h3>
-    <p>This tool creates clean, consistent MobileTech resolution notes. Use <strong>Copy All</strong> when finished.</p>
+    <p>Create clean MobileTech notes. Use <strong>Copy All</strong> when finished.</p>
   </div>
 </div>
 
 <script>
-/* ================= Utilities ================= */
+/* ============== Utilities ============== */
 function today(){ return new Date().toISOString().split("T")[0]; }
 function fmtDateMMDDYY(v){
   const d = new Date(v + "T00:00");
-  if (isNaN(d.getTime())) return v; // fallback (should not happen)
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  const yy = String(d.getFullYear()).slice(-2);
-  return `${mm}/${dd}/${yy}`;
+  if (isNaN(d.getTime())) return v;
+  return `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}/${String(d.getFullYear()).slice(-2)}`;
 }
 function toAMPM(time){
   if(!time) return "";
@@ -122,7 +122,7 @@ function toAMPM(time){
   return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${ap}`;
 }
 
-/* ================= Smart-fill stores ================= */
+/* ============== Smart-fill stores (ALL CAPS) ============== */
 function storeGet(k){ return JSON.parse(localStorage.getItem(k)||"[]"); }
 function storeAdd(k,v){
   if(!v) return;
@@ -132,115 +132,120 @@ function storeAdd(k,v){
 }
 function fillList(id, arr){
   const dl = document.getElementById(id); dl.innerHTML = "";
-  arr.forEach(v => { const o = document.createElement("option"); o.value = v; dl.appendChild(o); });
+  arr.forEach(v => { const o=document.createElement("option"); o.value=v; dl.appendChild(o); });
 }
 
-/* ================= Static seeds ================= */
+/* Static seeds */
 const STATIC_CUSTOMERS = [
-  "2STONE INDUSTRIES","APACHE","BIG D EQUIPMENT","BIG D CONSTRUCTION",
-  "BIG D WATER TREATMENT","BLACKBEARD","BLUE ARROW","CERTARUS","CHEVRON",
-  "CIRCLE S ENERGY","CITY OF MIDLAND","CIVITAS RESOURCES","CLEAR WATER",
-  "CONOCOPHILLIPS","DEEP BLUE OPERATING","DIAMONDBACK E&P",
-  "ELEVATE ENERGY SERVICES","FASKEN OIL & RANCH","HONCHO ENERGY GROUP",
-  "HONDO RESOURCES","MADDOG SERVICES","MIDLAND COUNTRY CLUB","ONE X",
-  "OVINTIV","OXY USA","OXYROCK OPERATING, LLC","PALOMA MIDSTREAM",
-  "PERMIAN RESOURCES","PETRO-HUNT","PETROPLEX ENERGY","RATTLER MIDSTREAM",
+  "2STONE INDUSTRIES","APACHE","BIG D EQUIPMENT","BIG D CONSTRUCTION","BIG D WATER TREATMENT",
+  "BLACKBEARD","BLUE ARROW","CERTARUS","CHEVRON","CIRCLE S ENERGY","CITY OF MIDLAND",
+  "CIVITAS RESOURCES","CLEAR WATER","CONOCOPHILLIPS","DEEP BLUE OPERATING","DIAMONDBACK E&P",
+  "ELEVATE ENERGY SERVICES","FASKEN OIL & RANCH","HONCHO ENERGY GROUP","HONDO RESOURCES",
+  "MADDOG SERVICES","MIDLAND COUNTRY CLUB","ONE X","OVINTIV","OXY USA","OXYROCK OPERATING, LLC",
+  "PALOMA MIDSTREAM","PERMIAN RESOURCES","PETRO-HUNT","PETROPLEX ENERGY","RATTLER MIDSTREAM",
   "SUMMIT PETROLEUM","VITAL ENERGY","VTX ENERGY","XTO ENERGY","ZARVONA ENERGY"
 ];
 const RENTAL_DESCS = ["325 HP PUMP","600 HP PUMP","12\" LAYFLAT","10\" LAYFLAT","ROAD CROSSING","GENERATOR","FLOWMETER"];
-const MATERIAL_DESCS = ["LINER","GEO","FUEL","CLAMPS","FITTINGS"]; // no LAYFLAT here
+const MATERIAL_DESCS = ["LINER","GEO","FUEL","CLAMPS","FITTINGS"]; // no LAYFLAT per request
 
 function seedOnce(){
   // Customers
   const cust = storeGet("customers");
-  let changed=false;
-  STATIC_CUSTOMERS.forEach(c=>{ if(!cust.includes(c)){ cust.push(c); changed=true; } });
-  if(changed) localStorage.setItem("customers", JSON.stringify(cust));
-
-  // Description lists (do not store statics; we union at render time)
+  let updated=false;
+  STATIC_CUSTOMERS.forEach(c=>{ if(!cust.includes(c)){ cust.push(c); updated=true; }});
+  if(updated) localStorage.setItem("customers", JSON.stringify(cust));
 }
 
-/* ================= Crew helpers ================= */
+/* ============== Truck logic ============== */
+function enforceTruckFormat(input){ input.value = input.value.replace(/\D/g,"").slice(0,4); }
+
+function blockDuplicateTruck(input){
+  const val = input.value;
+  if (!/^\d{4}$/.test(val)) return;
+  const dayCard = input.closest(".card");
+  const all = dayCard.querySelectorAll(".trucks input");
+  for(const other of all){
+    if(other === input) continue;
+    if(other.value === val){
+      const crew = other.closest("details").querySelector("summary").textContent;
+      alert(`Truck #${val} is already assigned to ${crew} for this day.`);
+      input.value = "";
+      input.focus();
+      return;
+    }
+  }
+}
+
+/* ============== Crew helpers ============== */
 function updateCrewMembers(sel){
   const grid = sel.closest("details").querySelector(".crew-grid");
   grid.innerHTML = "";
-  const count = parseInt(sel.value,10) || 0;
-
-  for(let i=0;i<count;i++){
-    const inp = document.createElement("input");
-    inp.placeholder = `Crew Member ${i+1}`;
+  for(let i=0;i<+sel.value;i++){
+    const inp=document.createElement("input");
+    inp.placeholder=`Crew Member ${i+1}`;
     inp.setAttribute("list","crewMemberList");
-
-    // ALL CAPS typing
     inp.oninput = e => e.target.value = e.target.value.toUpperCase();
-
-    // On blur: duplicate-per-day check + learn
-    inp.onblur = e => {
+    inp.onblur  = e => {
       const val = e.target.value.trim();
       if(!val) return;
-
+      // Duplicate-per-day block for crew members
       const day = e.target.closest(".card");
-      const thisInput = e.target;
-
+      const self = e.target;
       day.querySelectorAll(".crew-grid input").forEach(other=>{
-        if(other!==thisInput && other.value === val){
+        if(other!==self && other.value === val){
           const crew = other.closest("details").querySelector("summary").textContent;
           alert(`${val} is already assigned to ${crew} for this day.`);
-          thisInput.value = "";
-          thisInput.focus();
+          self.value=""; self.focus();
         }
       });
-
-      if (thisInput.value) { // only learn if not cleared
-        storeAdd("crewMembers", val);
+      if(self.value){
+        storeAdd("crewMembers", self.value);
         fillList("crewMemberList", storeGet("crewMembers"));
       }
     };
-
     grid.appendChild(inp);
   }
 }
 
-/* ================= Row adder (rentals/materials) ================= */
 function addRow(container, placeholders, listIdForDescription){
-  const row = document.createElement("div");
-  row.className = "line-row";
+  const row=document.createElement("div");
+  row.className="line-row";
   placeholders.forEach((ph,idx)=>{
-    const inp = document.createElement("input");
-    inp.placeholder = ph;
-
-    // Description field smart-fill (index=1)
+    const inp=document.createElement("input");
+    inp.placeholder=ph;
+    // Description smart-fill (index 1)
     if(idx===1 && listIdForDescription){
-      inp.setAttribute("list", listIdForDescription);
+      inp.setAttribute("list",listIdForDescription);
       inp.oninput = e => e.target.value = e.target.value.toUpperCase();
       inp.onblur  = e => {
-        const v = e.target.value.trim();
-        if(!v) return;
-        storeAdd(listIdForDescription==="rentalDescList" ? "rentalDesc" : "materialDesc", v);
-        const union = (listIdForDescription==="rentalDescList")
+        const v=e.target.value.trim(); if(!v) return;
+        storeAdd(listIdForDescription==="rentalDescList"?"rentalDesc":"materialDesc", v);
+        const union = listIdForDescription==="rentalDescList"
           ? [...RENTAL_DESCS, ...storeGet("rentalDesc")]
           : [...MATERIAL_DESCS, ...storeGet("materialDesc")];
         fillList(listIdForDescription, union);
       };
     }
-
     row.appendChild(inp);
   });
-  const rm = document.createElement("button");
-  rm.textContent = "✕";
-  rm.className = "remove-btn";
-  rm.onclick = () => row.remove();
+  const rm=document.createElement("button");
+  rm.textContent="✕"; rm.className="remove-btn"; rm.onclick=()=>row.remove();
   row.appendChild(rm);
   container.appendChild(row);
 }
 
-/* ================= Create crew ================= */
+/* ============== Create Crew ============== */
 function createCrew(num){
-  const d = document.createElement("details");
-  d.className = "crew"; d.open = true;
+  const d=document.createElement("details");
+  d.className="crew"; d.open=true;
 
   d.innerHTML = `
     <summary>Crew #${num}</summary>
+
+    <label>Trucks</label>
+    <div class="helper">All trucks taken to the location for this crew.</div>
+    <div class="trucks"></div>
+    <button class="addTruck">Add Truck</button>
 
     <label>Crew size</label>
     <select>
@@ -269,43 +274,74 @@ function createCrew(num){
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  const sel = d.querySelector("select");
-  sel.onchange = () => updateCrewMembers(sel);
+  // Crew size => members
+  const sel=d.querySelector("select");
+  sel.onchange=()=>updateCrewMembers(sel);
   updateCrewMembers(sel);
 
-  d.querySelector(".addRental").onclick  = () => addRow(
+  // Add initial empty truck row (so tech sees the slot)
+  function addTruckRow(){
+    const row=document.createElement("div");
+    row.className="line-row";
+    const t=document.createElement("input");
+    t.placeholder="0000"; t.maxLength=4; t.inputMode="numeric";
+    t.oninput = ()=>enforceTruckFormat(t);
+    t.onblur  = ()=>{
+      if(t.value && !/^\d{4}$/.test(t.value)){
+        alert("Truck number must be exactly 4 digits");
+        t.value=""; return;
+      }
+      blockDuplicateTruck(t);
+    };
+    const rm=document.createElement("button");
+    rm.textContent="✕"; rm.className="remove-btn"; rm.onclick=()=>row.remove();
+    row.appendChild(t); row.appendChild(rm);
+    d.querySelector(".trucks").appendChild(row);
+  }
+  d.querySelector(".addTruck").onclick = addTruckRow;
+  addTruckRow(); // one visible by default
+
+  // Rentals / Materials adders
+  d.querySelector(".addRental").onclick  = ()=>addRow(
     d.querySelector(".rentals"),
     ["Item / Unit #","Description","Qty / Distance","Vendor","PO"],
     "rentalDescList"
   );
-  d.querySelector(".addMaterial").onclick = () => addRow(
+  d.querySelector(".addMaterial").onclick = ()=>addRow(
     d.querySelector(".materials"),
     ["Item / Description","Description","Qty","Vendor","PO"],
     "materialDescList"
   );
 
-  d.querySelector(".removeCrew").onclick = () => d.remove();
+  // Delete Crew with in-day renumbering
+  d.querySelector(".removeCrew").onclick = ()=>{
+    const dayContainer = d.parentElement;
+    d.remove();
+    [...dayContainer.querySelectorAll("details.crew")].forEach((crewEl, idx)=>{
+      const sm=crewEl.querySelector("summary"); if(sm) sm.textContent=`Crew #${idx+1}`;
+    });
+  };
 
   return d;
 }
 
-/* ================= Day ================= */
+/* ============== Day ============== */
 function addDay(dateStr){
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `<label>Date</label><input type="date" value="${dateStr}" />`;
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<label>Date</label><input type="date" value="${dateStr}" />`;
 
-  const crews = document.createElement("div");
+  const crews=document.createElement("div");
   crews.appendChild(createCrew(1));
 
-  const controls = document.createElement("div");
-  const addCrewBtn = document.createElement("button");
-  addCrewBtn.textContent = "Add Crew";
-  addCrewBtn.onclick = () => crews.appendChild(createCrew(crews.children.length+1));
+  const controls=document.createElement("div");
+  const addCrewBtn=document.createElement("button");
+  addCrewBtn.textContent="Add Crew";
+  addCrewBtn.onclick=()=>crews.appendChild(createCrew(crews.children.length+1));
 
-  const deleteDayBtn = document.createElement("button");
-  deleteDayBtn.textContent = "Delete Day";
-  deleteDayBtn.onclick = () => {
+  const deleteDayBtn=document.createElement("button");
+  deleteDayBtn.textContent="Delete Day";
+  deleteDayBtn.onclick=()=>{
     if(confirm("Delete this day and all its crews?")){
       card.remove();
       if(document.querySelectorAll("#days .card").length===0) addDay(today());
@@ -314,34 +350,53 @@ function addDay(dateStr){
 
   controls.appendChild(addCrewBtn);
   controls.appendChild(deleteDayBtn);
-
   card.appendChild(crews);
   card.appendChild(controls);
   document.getElementById("days").appendChild(card);
 }
 
-/* ================= Copy All (corrected) ================= */
+/* ============== Copy All (with validations) ============== */
 document.getElementById("copyAll").onclick = () => {
+  // Validation: each crew must have at least one valid truck
+  const allCrews = document.querySelectorAll("#days .card details.crew");
+  for(const cr of allCrews){
+    const trucks = [...cr.querySelectorAll(".trucks input")]
+      .map(i=>i.value.trim()).filter(v=>/^\d{4}$/.test(v));
+    if(trucks.length===0){
+      const name = cr.querySelector("summary").textContent;
+      alert(`${name} requires at least one truck (4 digits) before copying.`);
+      cr.open = true;
+      const firstTruck = cr.querySelector(".trucks input");
+      if(firstTruck) firstTruck.focus();
+      return; // abort copy
+    }
+  }
+
   let out = [];
 
-  // Header — CUSTOMER – LEASE/LOCATION in ALL CAPS
+  // Header — CUSTOMER – LEASE (ALL CAPS)
   const cust = document.getElementById("customer").value.trim().toUpperCase();
   const loc  = document.getElementById("location").value.trim().toUpperCase();
-  if (cust || loc) out.push([cust, loc].filter(Boolean).join(" – "), "");
+  if(cust || loc) out.push([cust, loc].filter(Boolean).join(" – "), "");
 
   // Each day
-  document.querySelectorAll("#days .card").forEach(day => {
+  document.querySelectorAll("#days .card").forEach(day=>{
     const dateInput = day.querySelector('input[type="date"]');
     out.push(fmtDateMMDDYY(dateInput ? dateInput.value : ""));
 
     // Each crew
-    day.querySelectorAll("details.crew").forEach((cr, idx) => {
+    day.querySelectorAll("details.crew").forEach((cr, idx)=>{
       const crewNum = idx+1;
       const size = cr.querySelector("select").value;
       out.push(`Crew #${crewNum} – ${size}-MAN CREW`);
 
+      // Trucks
+      const trucks = [...cr.querySelectorAll(".trucks input")]
+        .map(i=>i.value.trim()).filter(v=>v);
+      if(trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
+
       // Members
-      const members = [...cr.querySelectorAll(".crew-grid input")]
+      const members=[...cr.querySelectorAll(".crew-grid input")]
         .map(i=>i.value.trim()).filter(Boolean);
       if(members.length) out.push(members.join(", "));
 
@@ -349,31 +404,27 @@ document.getElementById("copyAll").onclick = () => {
       const times = cr.querySelectorAll('input[type="time"]');
       const start = toAMPM(times[0]?.value||"");
       const stop  = toAMPM(times[1]?.value||"");
-      if (start || stop) out.push(`Start: ${start}   Stop: ${stop}`);
+      if(start || stop) out.push(`Start: ${start}   Stop: ${stop}`);
 
       // Notes
       const notes = cr.querySelector("textarea").value.trim();
-      if (notes) out.push(notes);
+      if(notes) out.push(notes);
 
-      // Rentals (row-by-row bullets)
-      const rentalRows = cr.querySelectorAll(".rentals .line-row");
+      // Rentals (per row)
       const rentalLines = [];
-      rentalRows.forEach(row=>{
-        const vals = [...row.querySelectorAll("input")]
-          .map(i=>i.value.trim()).filter(Boolean);
+      cr.querySelectorAll(".rentals .line-row").forEach(row=>{
+        const vals=[...row.querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
         if(vals.length) rentalLines.push(`• ${vals.join(" – ")}`);
       });
-      if (rentalLines.length) { out.push("", "Rentals:"); out.push(...rentalLines); }
+      if(rentalLines.length){out.push("", "Rentals:"); out.push(...rentalLines);}
 
-      // Materials (row-by-row bullets)
-      const materialRows = cr.querySelectorAll(".materials .line-row");
+      // Materials (per row)
       const materialLines = [];
-      materialRows.forEach(row=>{
-        const vals = [...row.querySelectorAll("input")]
-          .map(i=>i.value.trim()).filter(Boolean);
+      cr.querySelectorAll(".materials .line-row").forEach(row=>{
+        const vals=[...row.querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
         if(vals.length) materialLines.push(`• ${vals.join(" – ")}`);
       });
-      if (materialLines.length) { out.push("", "Materials:"); out.push(...materialLines); }
+      if(materialLines.length){out.push("", "Materials:"); out.push(...materialLines);}
 
       out.push(""); // spacer between crews
     });
@@ -385,50 +436,52 @@ document.getElementById("copyAll").onclick = () => {
   alert("Copied to clipboard.");
 };
 
-/* ================= Help Pane ================= */
-const helpOverlay = document.getElementById("helpOverlay");
-document.getElementById("helpBtn").onclick   = () => helpOverlay.style.display = "block";
-document.getElementById("helpClose").onclick = () => helpOverlay.style.display = "none";
-helpOverlay.onclick = (e) => { if (e.target === helpOverlay) helpOverlay.style.display = "none"; };
+/* ============== Help Pane ============== */
+const helpOverlay=document.getElementById("helpOverlay");
+document.getElementById("helpBtn").onclick   = ()=>helpOverlay.style.display="block";
+document.getElementById("helpClose").onclick = ()=>helpOverlay.style.display="none";
+helpOverlay.onclick = e=>{ if(e.target===helpOverlay) helpOverlay.style.display="none"; };
 
-/* ================= Init & Buttons ================= */
-document.addEventListener("DOMContentLoaded", () => {
+/* ============== Init & Buttons ============== */
+document.addEventListener("DOMContentLoaded", ()=>{
   seedOnce();
 
   // Populate smart-fill lists
-  fillList("customerList", storeGet("customers"));
-  fillList("crewMemberList", storeGet("crewMembers"));
+  fillList("customerList",  storeGet("customers"));
+  fillList("locationList",  storeGet("locations"));
+  fillList("crewMemberList",storeGet("crewMembers"));
   fillList("rentalDescList",  [...RENTAL_DESCS,  ...storeGet("rentalDesc")]);
   fillList("materialDescList",[...MATERIAL_DESCS,...storeGet("materialDesc")]);
 
   addDay(today());
 
   // Next Day
-  document.getElementById("nextDay").onclick = () => {
+  document.getElementById("nextDay").onclick = ()=>{
     const lastDateInput = document.querySelector('#days .card:last-child input[type="date"]');
     const lastDateStr = lastDateInput ? lastDateInput.value : today();
-    const d = new Date(lastDateStr + "T00:00");
-    d.setDate(d.getDate() + 1);
+    const d=new Date(lastDateStr+"T00:00");
+    d.setDate(d.getDate()+1);
     addDay(d.toISOString().split("T")[0]);
   };
 
-  // Clear All (also clears header fields; keeps device memory)
-  document.getElementById("clearAll").onclick = () => {
-    if (confirm("Clear all entries?")) {
-      document.getElementById("customer").value = "";
-      document.getElementById("location").value = "";
-      document.getElementById("days").innerHTML = "";
+  // Clear All (clear header + days; keep device memory)
+  document.getElementById("clearAll").onclick = ()=>{
+    if(confirm("Clear all entries?")){
+      document.getElementById("customer").value="";
+      document.getElementById("location").value="";
+      document.getElementById("days").innerHTML="";
       addDay(today());
     }
   };
 });
 
-// Header inputs ALL CAPS + learn customers
-const customerInput = document.getElementById("customer");
-const locationInput = document.getElementById("location");
-customerInput.oninput = e => e.target.value = e.target.value.toUpperCase();
-locationInput.oninput = e => e.target.value = e.target.value.toUpperCase();
-customerInput.onblur  = e => { storeAdd("customers", e.target.value); fillList("customerList", storeGet("customers")); };
+// Header inputs: ALL CAPS + learn
+const customerInput=document.getElementById("customer");
+const locationInput=document.getElementById("location");
+customerInput.oninput = e=>e.target.value=e.target.value.toUpperCase();
+locationInput.oninput = e=>e.target.value=e.target.value.toUpperCase();
+customerInput.onblur  = e=>{ storeAdd("customers", e.target.value); fillList("customerList", storeGet("customers")); };
+locationInput.onblur  = e=>{ storeAdd("locations", e.target.value); fillList("locationList", storeGet("locations")); };
 </script>
 </body>
 </html>
