@@ -1,3 +1,15 @@
+<!-- Template V1.3.3 (Production)
+     Promoted from V1.3.3-dev — DEV visuals removed (neutral background, no dev badge).
+     Features:
+       • Customer & Lease smart-fill (ALL CAPS + learning)
+       • Trucks: per-row ✕, 4-digit, same-day duplicate hard-block; Copy All requires ≥1 truck per crew
+       • Crew members smart-fill (ALL CAPS) + same-day duplicate block
+       • Rentals/Materials: DESCRIPTION smart-fill (seeded + learning)
+       • Copy All: CUSTOMER – LEASE (ALL CAPS), Date MM/DD/YY, Crew # – X‑MAN CREW, AM/PM, row bullets
+       • Next Day / Delete Day / Clear All
+       • Descriptive Help pane
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +24,6 @@ body { font-family: system-ui, Arial, sans-serif; background:#f8fafc; margin:0; 
 
 .top-bar { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; }
 h1 { margin:0; font-size:20px; }
-.dev-badge { background:#2563eb; color:#fff; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px; }
 
 button { padding:8px 12px; border-radius:6px; border:1px solid #d1d5db; background:#fff; cursor:pointer; }
 .primary { background:#0f62fe; color:#fff; }
@@ -47,6 +58,9 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 .help-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; z-index:100; }
 .help-panel { position:absolute; right:0; top:0; width:420px; max-width:100%; height:100%; background:#fff; padding:16px; overflow-y:auto; }
 .help-close { text-align:right; font-weight:600; color:#0f62fe; cursor:pointer; }
+.help-panel h3 { margin-top:0; }
+.help-panel pre { background:#f3f4f6; padding:8px; border-radius:6px; overflow:auto; }
+.help-panel hr { border:0; border-top:1px solid #e5e7eb; margin:16px 0; }
 </style>
 </head>
 
@@ -82,12 +96,80 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- Help Pane (kept concise) -->
+<!-- Help Pane (descriptive) -->
 <div class="help-overlay" id="helpOverlay">
   <div class="help-panel">
     <div class="help-close" id="helpClose">Close ✕</div>
+
     <h3>How to Use This Page</h3>
-    <p>Create clean MobileTech notes. Use <strong>Copy All</strong> when finished.</p>
+    <p>This page helps you build clean, consistent MobileTech resolution notes. Nothing is saved to a server. When finished, click <strong>Copy All</strong> and paste into MobileTech.</p>
+
+    <hr />
+    <h4>Customer / Lease</h4>
+    <p>Enter the Customer and Lease / Location once at the top. These apply to all days below unless you change them.</p>
+    <pre>OXY USA – SCR LEASE</pre>
+
+    <hr />
+    <h4>Days &amp; Next Day</h4>
+    <p>Each date represents a separate work day. <strong>Next Day</strong> adds a new date and starts fresh at Crew #1. Customer and Lease remain.</p>
+
+    <hr />
+    <h4>Crews</h4>
+    <p>Use one crew per working group. You can add additional crews for the same day. Crews can be collapsed to make review easier.</p>
+
+    <hr />
+    <h4>Trucks</h4>
+    <ul>
+      <li>Enter <strong>all trucks taken to the location</strong> for the crew.</li>
+      <li>Truck numbers must be <strong>exactly 4 digits</strong>.</li>
+      <li><strong>Duplicates on the same day are blocked</strong> and the conflicting crew is identified.</li>
+      <li><strong>At least one truck</strong> is required per crew to Copy All.</li>
+    </ul>
+
+    <hr />
+    <h4>Start / Stop Time</h4>
+    <p>Enter accurate start and stop times. These are used for billing and documentation. Times are formatted in <strong>AM/PM</strong> on Copy All.</p>
+
+    <hr />
+    <h4>Crew Members</h4>
+    <ul>
+      <li>Type names in <strong>ALL CAPS</strong>; suggestions appear from previous use.</li>
+      <li>A crew member <strong>cannot be assigned to two crews on the same day</strong>.</li>
+    </ul>
+
+    <hr />
+    <h4>Work Performed</h4>
+    <p>Briefly describe the work completed for the day. Include important context such as delays, scope changes, added requests, and issues.</p>
+    <pre>Installed pumps and staged equipment.
+Weather delay approximately 1.5 hours.
+Additional work added per customer request.</pre>
+
+    <hr />
+    <h4>Rentals (Returning)</h4>
+    <p>Equipment left on location that will be picked up later. Enter each as a row. The <strong>Description</strong> field has suggestions for common equipment.</p>
+    <pre>Pumps, generators, automation, road crossings, flowmeters, layflat</pre>
+
+    <hr />
+    <h4>Materials (Not Returning)</h4>
+    <p>Items used or sold to the customer. The <strong>Description</strong> field has suggestions for common items.</p>
+    <pre>Liner, geo, fuel, clamps, fittings</pre>
+
+    <hr />
+    <h4>Copy All</h4>
+    <ul>
+      <li>Creates clean, MobileTech‑ready text.</li>
+      <li>Skips empty sections.</li>
+      <li>Includes: Customer – Lease, Date (MM/DD/YY), <strong>Crew # – X‑MAN CREW</strong>, Trucks, Crew Members, Times (AM/PM), Work Performed, Rentals, Materials.</li>
+      <li>Each rental/material row is a single bullet using the values provided for that row.</li>
+    </ul>
+
+    <hr />
+    <h4>Quick Tips</h4>
+    <ul>
+      <li>Use Add Crew for multiple working groups on the same day.</li>
+      <li>Use Delete Day if a day was added by mistake (a fresh day is added back if none remain).</li>
+      <li>Use Clear All to start over (smart‑fill memory remains on your device).</li>
+    </ul>
   </div>
 </div>
 
@@ -134,7 +216,6 @@ const RENTAL_DESCS = ["325 HP PUMP","600 HP PUMP","12\" LAYFLAT","10\" LAYFLAT",
 const MATERIAL_DESCS = ["LINER","GEO","FUEL","CLAMPS","FITTINGS"]; // no LAYFLAT per request
 
 function seedOnce(){
-  // Customers
   const cust = storeGet("customers");
   let updated=false;
   STATIC_CUSTOMERS.forEach(c=>{ if(!cust.includes(c)){ cust.push(c); updated=true; }});
@@ -143,7 +224,6 @@ function seedOnce(){
 
 /* ============== Truck logic ============== */
 function enforceTruckFormat(input){ input.value = input.value.replace(/\D/g,"").slice(0,4); }
-
 function blockDuplicateTruck(input){
   const val = input.value;
   if (!/^\d{4}$/.test(val)) return;
@@ -173,7 +253,6 @@ function updateCrewMembers(sel){
     inp.onblur  = e => {
       const val = e.target.value.trim();
       if(!val) return;
-      // Duplicate-per-day block for crew members
       const day = e.target.closest(".card");
       const self = e.target;
       day.querySelectorAll(".crew-grid input").forEach(other=>{
@@ -198,7 +277,6 @@ function addRow(container, placeholders, listIdForDescription){
   placeholders.forEach((ph,idx)=>{
     const inp=document.createElement("input");
     inp.placeholder=ph;
-    // Description smart-fill (index 1)
     if(idx===1 && listIdForDescription){
       inp.setAttribute("list",listIdForDescription);
       inp.oninput = e => e.target.value = e.target.value.toUpperCase();
@@ -259,12 +337,10 @@ function createCrew(num){
     <button class="removeCrew">Delete Crew</button>
   `;
 
-  // Crew size => members
   const sel=d.querySelector("select");
   sel.onchange=()=>updateCrewMembers(sel);
   updateCrewMembers(sel);
 
-  // Add initial empty truck row (so tech sees the slot)
   function addTruckRow(){
     const row=document.createElement("div");
     row.className="line-row";
@@ -272,10 +348,7 @@ function createCrew(num){
     t.placeholder="0000"; t.maxLength=4; t.inputMode="numeric";
     t.oninput = ()=>enforceTruckFormat(t);
     t.onblur  = ()=>{
-      if(t.value && !/^\d{4}$/.test(t.value)){
-        alert("Truck number must be exactly 4 digits");
-        t.value=""; return;
-      }
+      if(t.value && !/^\d{4}$/.test(t.value)){ alert("Truck number must be exactly 4 digits"); t.value=""; return; }
       blockDuplicateTruck(t);
     };
     const rm=document.createElement("button");
@@ -284,9 +357,8 @@ function createCrew(num){
     d.querySelector(".trucks").appendChild(row);
   }
   d.querySelector(".addTruck").onclick = addTruckRow;
-  addTruckRow(); // one visible by default
+  addTruckRow(); // show one by default
 
-  // Rentals / Materials adders
   d.querySelector(".addRental").onclick  = ()=>addRow(
     d.querySelector(".rentals"),
     ["Item / Unit #","Description","Qty / Distance","Vendor","PO"],
@@ -298,12 +370,11 @@ function createCrew(num){
     "materialDescList"
   );
 
-  // Delete Crew with in-day renumbering
   d.querySelector(".removeCrew").onclick = ()=>{
     const dayContainer = d.parentElement;
     d.remove();
     [...dayContainer.querySelectorAll("details.crew")].forEach((crewEl, idx)=>{
-      const sm=crewEl.querySelector("summary"); if(sm) sm.textContent=`Crew #${idx+1}`;
+      const sm = crewEl.querySelector("summary"); if(sm) sm.textContent = `Crew #${idx+1}`;
     });
   };
 
@@ -342,18 +413,17 @@ function addDay(dateStr){
 
 /* ============== Copy All (with validations) ============== */
 document.getElementById("copyAll").onclick = () => {
-  // Validation: each crew must have at least one valid truck
-  const allCrews = document.querySelectorAll("#days .card details.crew");
-  for(const cr of allCrews){
+  // Require at least one 4-digit truck per crew
+  const crews = document.querySelectorAll("#days .card details.crew");
+  for(const cr of crews){
     const trucks = [...cr.querySelectorAll(".trucks input")]
       .map(i=>i.value.trim()).filter(v=>/^\d{4}$/.test(v));
     if(trucks.length===0){
       const name = cr.querySelector("summary").textContent;
       alert(`${name} requires at least one truck (4 digits) before copying.`);
       cr.open = true;
-      const firstTruck = cr.querySelector(".trucks input");
-      if(firstTruck) firstTruck.focus();
-      return; // abort copy
+      const first = cr.querySelector(".trucks input"); if(first) first.focus();
+      return;
     }
   }
 
@@ -375,27 +445,20 @@ document.getElementById("copyAll").onclick = () => {
       const size = cr.querySelector("select").value;
       out.push(`Crew #${crewNum} – ${size}-MAN CREW`);
 
-      // Trucks
-      const trucks = [...cr.querySelectorAll(".trucks input")]
-        .map(i=>i.value.trim()).filter(v=>v);
+      const trucks = [...cr.querySelectorAll(".trucks input")].map(i=>i.value.trim()).filter(Boolean);
       if(trucks.length) out.push(`Trucks: ${trucks.join(", ")}`);
 
-      // Members
-      const members=[...cr.querySelectorAll(".crew-grid input")]
-        .map(i=>i.value.trim()).filter(Boolean);
+      const members = [...cr.querySelectorAll(".crew-grid input")].map(i=>i.value.trim()).filter(Boolean);
       if(members.length) out.push(members.join(", "));
 
-      // Times (AM/PM)
       const times = cr.querySelectorAll('input[type="time"]');
       const start = toAMPM(times[0]?.value||"");
       const stop  = toAMPM(times[1]?.value||"");
       if(start || stop) out.push(`Start: ${start}   Stop: ${stop}`);
 
-      // Notes
       const notes = cr.querySelector("textarea").value.trim();
       if(notes) out.push(notes);
 
-      // Rentals (per row)
       const rentalLines = [];
       cr.querySelectorAll(".rentals .line-row").forEach(row=>{
         const vals=[...row.querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
@@ -403,7 +466,6 @@ document.getElementById("copyAll").onclick = () => {
       });
       if(rentalLines.length){out.push("", "Rentals:"); out.push(...rentalLines);}
 
-      // Materials (per row)
       const materialLines = [];
       cr.querySelectorAll(".materials .line-row").forEach(row=>{
         const vals=[...row.querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
@@ -470,4 +532,3 @@ locationInput.onblur  = e=>{ storeAdd("locations", e.target.value); fillList("lo
 </script>
 </body>
 </html>
-
