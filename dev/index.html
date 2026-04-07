@@ -1,6 +1,18 @@
-<!-- Template V1.3.3-dev (Sandbox)
-     Change from V1.3.2-dev: Restored full descriptive Help pane content.
-     Everything else remains identical and working as validated.
+<!-- Template V1.3.4-dev (Sandbox)
+     Base: V1.3.3-dev/v1.3.2-dev working set
+     Updates in this version:
+       • Start/Stop supports unlimited blocks per crew (+ Add Block, ✕ Delete Block)
+       • Copy All hard-blocks if ANY time block is incomplete (Start without Stop or Stop without Start)
+       • Copy All outputs Start/Stop section with bullet blocks (keeps title "Start/Stop")
+       • Restores on-page helper instructions under Trucks, Start/Stop, Work Performed, Rentals, Materials
+       • All previous validated functionality preserved:
+           - Trucks: per-row ✕, 4-digit, same-day duplicate hard-block; ≥1 truck required per crew to copy
+           - Customer & Lease smart-fill (ALL CAPS + learning)
+           - Crew members smart-fill (ALL CAPS) + same-day duplicate block
+           - Rentals/Materials Description smart-fill (seeded + learning)
+           - Copy All: header ALL CAPS, date MM/DD/YY, crew size in header, AM/PM times, row bullets
+           - Next Day, Delete Day, Clear All (clears header + days; keeps memory)
+           - DEV visuals: light-blue background + DEV badge
 -->
 
 <!DOCTYPE html>
@@ -12,7 +24,7 @@
 
 <style>
 /* ---- Base Layout ---- */
-body { font-family: system-ui, Arial, sans-serif; background:#eef6ff; /* DEV bg */ margin:0; }
+body { font-family: system-ui, Arial, sans-serif; background:#eef6ff; margin:0; } /* DEV bg */
 .wrapper { max-width:900px; margin:auto; padding:16px; padding-bottom:240px; }
 
 .top-bar { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; }
@@ -41,9 +53,18 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 
 .crew-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; }
 
-/* ---- Repeating line rows (trucks/rentals/materials) ---- */
+/* ---- Line rows (trucks/rentals/materials) ---- */
 .line-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) 36px; gap:6px; margin-top:6px; align-items:center; }
 .remove-btn { background:#ef4444; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+
+/* ---- Time block rows (Start/Stop blocks) ---- */
+.time-row {
+  display:grid;
+  grid-template-columns: 1fr 1fr 36px;
+  gap:6px;
+  margin-top:6px;
+  align-items:center;
+}
 
 /* ---- Bottom bar ---- */
 .bottom-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #e5e7eb; display:flex; justify-content:center; gap:8px; padding:10px; }
@@ -52,7 +73,6 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
 .help-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; z-index:100; }
 .help-panel { position:absolute; right:0; top:0; width:420px; max-width:100%; height:100%; background:#fff; padding:16px; overflow-y:auto; }
 .help-close { text-align:right; font-weight:600; color:#0f62fe; cursor:pointer; }
-.help-panel h3 { margin-top:0; }
 .help-panel pre { background:#f3f4f6; padding:8px; border-radius:6px; overflow:auto; }
 .help-panel hr { border:0; border-top:1px solid #e5e7eb; margin:16px 0; }
 </style>
@@ -91,80 +111,44 @@ details[open] summary::before { transform:rotate(90deg); display:inline-block; }
   <button id="copyAll">Copy All</button>
 </div>
 
-<!-- Help Pane (restored, descriptive) -->
+<!-- Help Pane (descriptive) -->
 <div class="help-overlay" id="helpOverlay">
   <div class="help-panel">
     <div class="help-close" id="helpClose">Close ✕</div>
 
     <h3>How to Use This Page</h3>
-    <p>This page helps you build clean, consistent MobileTech resolution notes. Nothing is saved to a server. When finished, click <strong>Copy All</strong> and paste into MobileTech.</p>
+    <p>This page helps you build clean, consistent MobileTech notes. When finished, click <strong>Copy All</strong> and paste into MobileTech.</p>
 
     <hr />
     <h4>Customer / Lease</h4>
-    <p>Enter the Customer and Lease / Location once at the top. These apply to all days below unless you change them.</p>
-    <pre>OXY USA – SCR LEASE</pre>
-
-    <hr />
-    <h4>Days &amp; Next Day</h4>
-    <p>Each date represents a separate work day. <strong>Next Day</strong> adds a new date and starts fresh at Crew #1. Customer and Lease remain.</p>
-
-    <hr />
-    <h4>Crews</h4>
-    <p>Use one crew per working group. You can add additional crews for the same day. Crews can be collapsed to make review easier.</p>
+    <p>Customer and Lease / Location apply to all days unless changed. Both are ALL CAPS and smart‑fill learns what you use.</p>
 
     <hr />
     <h4>Trucks</h4>
     <ul>
-      <li>Enter <strong>all trucks taken to the location</strong> for the crew.</li>
-      <li>Truck numbers must be <strong>exactly 4 digits</strong>.</li>
-      <li><strong>Duplicates on the same day are blocked</strong> and the conflicting crew is identified.</li>
-      <li><strong>At least one truck</strong> is required per crew to Copy All.</li>
+      <li>Enter all trucks taken to the location (4 digits only).</li>
+      <li>Duplicate trucks on the same day are blocked and identify the crew already assigned.</li>
+      <li>At least one truck is required per crew to Copy All.</li>
     </ul>
 
     <hr />
-    <h4>Start / Stop Time</h4>
-    <p>Enter accurate start and stop times. These are used for billing and documentation. Times are formatted in <strong>AM/PM</strong> on Copy All.</p>
-
-    <hr />
-    <h4>Crew Members</h4>
-    <ul>
-      <li>Type names in <strong>ALL CAPS</strong>; suggestions appear from previous use.</li>
-      <li>A crew member <strong>cannot be assigned to two crews on the same day</strong>.</li>
-    </ul>
+    <h4>Start/Stop</h4>
+    <p>You can add multiple Start/Stop blocks if the crew was called off and returned later. Copy All hard‑blocks if any block is incomplete.</p>
+    <pre>Start/Stop:
+• 07:00 AM – 11:30 AM
+• 02:15 PM – 06:00 PM</pre>
 
     <hr />
     <h4>Work Performed</h4>
-    <p>Briefly describe the work completed for the day. Include important context such as delays, scope changes, added requests, and issues.</p>
-    <pre>Installed pumps and staged equipment.
-Weather delay approximately 1.5 hours.
-Additional work added per customer request.</pre>
+    <p>Describe work completed during the day. Include delays, changes, added requests, or issues.</p>
 
     <hr />
-    <h4>Rentals (Returning)</h4>
-    <p>Equipment left on location that will be picked up later. Enter each as a row. The <strong>Description</strong> field has suggestions for common equipment.</p>
-    <pre>Pumps, generators, automation, road crossings, flowmeters, layflat</pre>
-
-    <hr />
-    <h4>Materials (Not Returning)</h4>
-    <p>Items used or sold to the customer. The <strong>Description</strong> field has suggestions for common items.</p>
-    <pre>Liner, geo, fuel, clamps, fittings</pre>
+    <h4>Rentals / Materials</h4>
+    <p>Rentals = returning equipment left on site. Materials = used/sold items not returning. Description fields have smart‑fill suggestions and learn new terms.</p>
 
     <hr />
     <h4>Copy All</h4>
-    <ul>
-      <li>Creates clean, MobileTech‑ready text.</li>
-      <li>Skips empty sections.</li>
-      <li>Includes: Customer – Lease, Date (MM/DD/YY), <strong>Crew # – X‑MAN CREW</strong>, Trucks, Crew Members, Times (AM/PM), Work Performed, Rentals, Materials.</li>
-      <li>Each rental/material row is a single bullet using the values provided for that row.</li>
-    </ul>
-
-    <hr />
-    <h4>Quick Tips</h4>
-    <ul>
-      <li>Use Add Crew for multiple working groups on the same day.</li>
-      <li>Use Delete Day if a day was added by mistake (a fresh day is added back if none remain).</li>
-      <li>Use Clear All to start over (smart‑fill memory remains on your device).</li>
-    </ul>
+    <p>Copies entered data into clean MobileTech‑ready text: MM/DD/YY date, Crew # – X‑MAN CREW, Trucks, Crew Members, Start/Stop bullets, Work, Rentals, Materials.</p>
   </div>
 </div>
 
@@ -292,6 +276,28 @@ function addRow(container, placeholders, listIdForDescription){
   container.appendChild(row);
 }
 
+/* ============== Time Blocks ============== */
+function addTimeBlock(container){
+  const row = document.createElement("div");
+  row.className = "time-row";
+
+  const start = document.createElement("input");
+  start.type = "time";
+
+  const stop = document.createElement("input");
+  stop.type = "time";
+
+  const rm = document.createElement("button");
+  rm.textContent = "✕";
+  rm.className = "remove-btn";
+  rm.onclick = () => row.remove();
+
+  row.appendChild(start);
+  row.appendChild(stop);
+  row.appendChild(rm);
+  container.appendChild(row);
+}
+
 /* ============== Create Crew ============== */
 function createCrew(num){
   const d=document.createElement("details");
@@ -315,17 +321,22 @@ function createCrew(num){
     <label>Crew members</label>
     <div class="crew-grid"></div>
 
-    <label>Start / Stop Time</label>
-    <div class="row"><input type="time"><input type="time"></div>
+    <label>Start/Stop</label>
+    <div class="helper">Add blocks if called off and returned. All blocks must have Start and Stop before Copy All.</div>
+    <div class="time-blocks"></div>
+    <button class="addTimeBlock">Add Time Block</button>
 
     <label>Work Performed</label>
+    <div class="helper">Describe work completed during the day. Include delays, changes, or issues.</div>
     <textarea></textarea>
 
     <label>Rentals</label>
+    <div class="helper">Equipment left on location that will be returned later.</div>
     <div class="rentals"></div>
     <button class="addRental">Add Rental</button>
 
     <label>Materials</label>
+    <div class="helper">Materials or parts used or sold to the customer.</div>
     <div class="materials"></div>
     <button class="addMaterial">Add Material</button>
 
@@ -336,6 +347,7 @@ function createCrew(num){
   sel.onchange=()=>updateCrewMembers(sel);
   updateCrewMembers(sel);
 
+  /* Trucks */
   function addTruckRow(){
     const row=document.createElement("div");
     row.className="line-row";
@@ -352,8 +364,14 @@ function createCrew(num){
     d.querySelector(".trucks").appendChild(row);
   }
   d.querySelector(".addTruck").onclick = addTruckRow;
-  addTruckRow(); // show one by default
+  addTruckRow(); // one by default
 
+  /* Time blocks */
+  const timeContainer = d.querySelector(".time-blocks");
+  d.querySelector(".addTimeBlock").onclick = () => addTimeBlock(timeContainer);
+  addTimeBlock(timeContainer); // one by default
+
+  /* Rentals / Materials */
   d.querySelector(".addRental").onclick  = ()=>addRow(
     d.querySelector(".rentals"),
     ["Item / Unit #","Description","Qty / Distance","Vendor","PO"],
@@ -365,6 +383,7 @@ function createCrew(num){
     "materialDescList"
   );
 
+  /* Delete Crew with in-day renumbering */
   d.querySelector(".removeCrew").onclick = ()=>{
     const dayContainer = d.parentElement;
     d.remove();
@@ -420,6 +439,26 @@ document.getElementById("copyAll").onclick = () => {
       const first = cr.querySelector(".trucks input"); if(first) first.focus();
       return;
     }
+
+    // Hard-block if ANY time block is incomplete
+    const blocks = cr.querySelectorAll(".time-blocks .time-row");
+    if(blocks.length===0){
+      alert(`${cr.querySelector("summary").textContent} requires at least one Start/Stop block.`);
+      cr.open = true;
+      return;
+    }
+    for(const b of blocks){
+      const start = b.querySelector('input[type="time"]:nth-child(1)').value;
+      const stop  = b.querySelector('input[type="time"]:nth-child(2)').value;
+      if((start && !stop) || (!start && stop)){
+        alert(`${cr.querySelector("summary").textContent} has an incomplete Start/Stop block. Please complete or delete it.`);
+        cr.open = true;
+        // focus missing
+        if(start && !stop) b.querySelectorAll('input[type="time"]')[1].focus();
+        if(!start && stop) b.querySelectorAll('input[type="time"]')[0].focus();
+        return;
+      }
+    }
   }
 
   let out = [];
@@ -446,10 +485,19 @@ document.getElementById("copyAll").onclick = () => {
       const members = [...cr.querySelectorAll(".crew-grid input")].map(i=>i.value.trim()).filter(Boolean);
       if(members.length) out.push(members.join(", "));
 
-      const times = cr.querySelectorAll('input[type="time"]');
-      const start = toAMPM(times[0]?.value||"");
-      const stop  = toAMPM(times[1]?.value||"");
-      if(start || stop) out.push(`Start: ${start}   Stop: ${stop}`);
+      // Start/Stop bullets (requested title)
+      const blocks = cr.querySelectorAll(".time-blocks .time-row");
+      const lines = [];
+      blocks.forEach(b=>{
+        const times = b.querySelectorAll('input[type="time"]');
+        const s = toAMPM(times[0].value);
+        const e = toAMPM(times[1].value);
+        if(s && e) lines.push(`• ${s} – ${e}`);
+      });
+      if(lines.length){
+        out.push("Start/Stop:");
+        out.push(...lines);
+      }
 
       const notes = cr.querySelector("textarea").value.trim();
       if(notes) out.push(notes);
